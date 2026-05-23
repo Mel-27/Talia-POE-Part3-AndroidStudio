@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "423938170023",
+    "project_id": "prog7313-poe-72fbe",
+    "storage_bucket": "prog7313-poe-72fbe.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:423938170023:android:143d7d0b9e3f303d504f82",
+        "android_client_info": {
+          "package_name": "com.gia.poe_demo"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD0PhyAywhvVnNELknwjUS5BflWzJMeA9Q"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:423938170023:android:adc74d602cd7ba7c504f82",
+        "android_client_info": {
+          "package_name": "com.test123"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD0PhyAywhvVnNELknwjUS5BflWzJMeA9Q"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

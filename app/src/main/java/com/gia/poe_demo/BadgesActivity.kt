@@ -93,25 +93,27 @@ class BadgesActivity : AppCompatActivity() {
      */
     private fun updatePointsDisplay(points: Int) {
         findViewById<TextView>(R.id.tvHoneyPoints).text = "$points 🍯"
-
-        val nextLabel = GamificationManager.getNextBadgeLabel(points)
+        findViewById<TextView>(R.id.tvNextBadgeSubtitle).text = GamificationManager.getNextBadgeLabel(points)
         // Find the subtitle TextView
         // that says "50 pts to Honey Collector" in the XML
         // It doesn't have an ID in the XML so we'll use the progress label instead
-        Log.d(TAG, "Next badge label: $nextLabel")
+        Log.d(TAG, "Next badge label: ${GamificationManager.getNextBadgeLabel(points)}")
     }
+
+
+
     /**
      * Updates the progress bar and the "200 / 250 pts" label.
      * Adapted from (Android Developers, 2026 -  ProgressBar.)
      */
     private fun updateProgressBar(points: Int) {
         val (current, target) = GamificationManager.getProgressToNextBadge(points)
-        val progressBar = findViewById<ProgressBar>(R.id.progressNextBadge)
-        progressBar.max      = target
-        progressBar.progress = current
-
+        findViewById<ProgressBar>(R.id.progressNextBadge).max = target
+        findViewById<ProgressBar>(R.id.progressNextBadge).progress = current
+        findViewById<TextView>(R.id.tvProgressLabel).text = "$current / $target pts"
         Log.d(TAG, "Progress: $current / $target")
     }
+
 
     /**
      * Updates each badge card to show earned (full opacity, green tick)

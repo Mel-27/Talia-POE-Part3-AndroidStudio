@@ -120,7 +120,7 @@
                             android:id="@+id/tvHoneyPoints"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="200 🍯"
+                            android:text="0 🍯"
                             android:textColor="@color/black_deep"
                             android:textSize="42sp"
                             android:fontFamily="@font/fredoka_one"
@@ -128,9 +128,10 @@
                             android:layout_marginTop="4dp" />
 
                         <TextView
+                            android:id="@+id/tvNextBadgeSubtitle"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="50 pts to Honey Collector"
+                            android:text=""
                             android:textColor="#88291A00"
                             android:textSize="12sp"
                             android:fontFamily="sans-serif-medium"
@@ -154,9 +155,10 @@
                                 android:fontFamily="sans-serif-medium" />
 
                             <TextView
+                                android:id="@+id/tvProgressLabel"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="200 / 250 pts"
+                                android:text=""
                                 android:textColor="#CC291A00"
                                 android:textSize="11sp"
                                 android:textStyle="bold"
@@ -171,7 +173,7 @@
                             style="?android:attr/progressBarStyleHorizontal"
                             android:layout_width="match_parent"
                             android:layout_height="12dp"
-                            android:progress="80"
+                            android:progress="0"
                             android:progressDrawable="@drawable/progress_dark"
                             android:indeterminate="false" />
 
