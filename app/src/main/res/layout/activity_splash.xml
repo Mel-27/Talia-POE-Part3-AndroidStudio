@@ -36,7 +36,7 @@
     android:gravity="center"
     android:background="@color/cream">
 
-
+    <!-- Logo -->
     <ImageView
         android:id="@+id/ivSplashLogo"
         android:layout_width="170dp"
@@ -47,7 +47,7 @@
 
 
 
-
+    <!-- Loading dots -->
     <TextView
         android:id="@+id/tvLoadingDots"
         android:layout_width="wrap_content"

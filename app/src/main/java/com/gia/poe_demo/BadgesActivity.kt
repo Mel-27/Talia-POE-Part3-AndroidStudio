@@ -10,9 +10,9 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
 import androidx.lifecycle.lifecycleScope
-import kotlinx.coroutines.launch
-import com.gia.poe_demo.data.database.AppDatabase
 import com.gia.poe_demo.HoneyPoints
+import com.gia.poe_demo.data.database.AppDatabase
+import kotlinx.coroutines.launch
 
 /*
 BadgesActivity — Displays the Hive Rewards gamification screen.

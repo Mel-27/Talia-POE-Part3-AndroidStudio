@@ -1,20 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-    ╔══════════════════════════════════════════════════════════════╗
-    ║     BUDGET BEE — Register Screen (Matches Login Design)     ║
-    ║                                                              ║
-    ║  Identical structure to activity_login_final.xml:           ║
-    ║  • Honey yellow header + honeycomb overlay + 🐝 emoji        ║
-    ║  • "Join the Hive!" title in Fredoka One                     ║
-    ║  • Cream card with rounded top corners overlapping header    ║
-    ║  • Log In / Sign Up tab switcher (Sign Up active)           ║
-    ║  • Uppercase field labels above each input                   ║
-    ║  • Clean outlined inputs — no icon overlap                   ║
-    ║  • Deprecated passwordToggleEnabled → endIconMode fix        ║
-    ║  • Honey pill Register button in Fredoka One                 ║
-    ║  • 🐝 divider + "Already have an account? Log In" link       ║
-    ╚══════════════════════════════════════════════════════════════╝
--->
 
 <ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"

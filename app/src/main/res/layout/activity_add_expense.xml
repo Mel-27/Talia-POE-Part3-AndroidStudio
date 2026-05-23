@@ -68,8 +68,6 @@
                     android:textSize="32sp"
                     android:fontFamily="@font/fredoka_one" />
 
-
-
             </LinearLayout>
 
             <!-- ════════════════════════════════════════════
@@ -214,12 +212,85 @@
 
                         </com.google.android.material.textfield.TextInputLayout>
 
+                        <!-- Start Time Field -->
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:id="@+id/tilStartTime"
+                            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="14dp"
+                            app:boxBackgroundColor="#FFFFFFFF"
+                            app:boxStrokeColor="@color/honey"
+                            app:boxStrokeWidth="2dp"
+                            app:hintTextColor="@color/muted_text"
+                            app:endIconMode="custom"
+                            app:endIconDrawable="@android:drawable/ic_menu_my_calendar"
+                            app:endIconTint="@color/honey_dark"
+                            app:boxCornerRadiusTopStart="14dp"
+                            app:boxCornerRadiusTopEnd="14dp"
+                            app:boxCornerRadiusBottomStart="14dp"
+                            app:boxCornerRadiusBottomEnd="14dp">
+
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/etStartTime"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:hint="Start Time"
+                                android:focusable="false"
+                                android:clickable="true"
+                                android:textColor="@color/black_deep"
+                                android:textColorHint="@color/muted_text"
+                                android:textSize="14sp"
+                                android:fontFamily="sans-serif"
+                                android:paddingStart="16dp"
+                                android:paddingEnd="16dp"
+                                android:paddingTop="14dp"
+                                android:paddingBottom="14dp" />
+
+                        </com.google.android.material.textfield.TextInputLayout>
+
+                        <!-- End Time Field -->
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:id="@+id/tilEndTime"
+                            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="14dp"
+                            app:boxBackgroundColor="#FFFFFFFF"
+                            app:boxStrokeColor="@color/honey"
+                            app:boxStrokeWidth="2dp"
+                            app:hintTextColor="@color/muted_text"
+                            app:endIconMode="none"
+                            app:boxCornerRadiusTopStart="14dp"
+                            app:boxCornerRadiusTopEnd="14dp"
+                            app:boxCornerRadiusBottomStart="14dp"
+                            app:boxCornerRadiusBottomEnd="14dp">
+
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/etEndTime"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:hint="End Time"
+                                android:focusable="false"
+                                android:clickable="true"
+                                android:textColor="@color/black_deep"
+                                android:textColorHint="@color/muted_text"
+                                android:textSize="14sp"
+                                android:fontFamily="sans-serif"
+                                android:paddingStart="16dp"
+                                android:paddingEnd="16dp"
+                                android:paddingTop="14dp"
+                                android:paddingBottom="14dp" />
+
+                        </com.google.android.material.textfield.TextInputLayout>
+
                         <!-- Category dropdown -->
                         <com.google.android.material.textfield.TextInputLayout
                             android:id="@+id/tilCategory"
                             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                             android:layout_width="match_parent"
-                            android:layout_height="wrap_content">
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="14dp">
 
                             <AutoCompleteTextView
                                 android:id="@+id/actvCategory"
@@ -267,25 +338,60 @@
                             android:letterSpacing="0.1"
                             android:layout_marginBottom="12dp" />
 
+                        <!-- Photo Action Buttons Row -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:layout_marginBottom="12dp">
+
+                            <Button
+                                android:id="@+id/btnTakePhoto"
+                                android:layout_width="0dp"
+                                android:layout_height="48dp"
+                                android:layout_weight="1"
+                                android:text="📷 Take Photo"
+                                android:textSize="12sp"
+                                android:layout_marginEnd="8dp"
+                                style="@style/Widget.MaterialComponents.Button.OutlinedButton" />
+
+                            <Button
+                                android:id="@+id/btnChooseFromGallery"
+                                android:layout_width="0dp"
+                                android:layout_height="48dp"
+                                android:layout_weight="1"
+                                android:text="🖼️ Gallery"
+                                android:textSize="12sp"
+                                android:layout_marginStart="8dp"
+                                style="@style/Widget.MaterialComponents.Button.OutlinedButton" />
+
+                        </LinearLayout>
+
                         <!-- Dashed upload area -->
                         <LinearLayout
                             android:id="@+id/photoUploadArea"
                             android:layout_width="match_parent"
-                            android:layout_height="150dp"
+                            android:layout_height="wrap_content"
+                            android:minHeight="150dp"
                             android:orientation="vertical"
                             android:gravity="center"
+                            android:padding="12dp"
                             android:background="@drawable/dashed_upload_bg"
                             android:clickable="true"
                             android:focusable="true">
 
+                            <!-- Placeholder icon — hidden after photo selected -->
                             <TextView
+                                android:id="@+id/tvPhotoPlaceholderIcon"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="🖼️"
                                 android:textSize="36sp"
                                 android:layout_marginBottom="10dp" />
 
+                            <!-- Placeholder title — hidden after photo selected -->
                             <TextView
+                                android:id="@+id/tvPhotoPlaceholderTitle"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="Tap to upload receipt"
@@ -294,7 +400,9 @@
                                 android:textStyle="bold"
                                 android:fontFamily="sans-serif-medium" />
 
+                            <!-- Placeholder subtitle — hidden after photo selected -->
                             <TextView
+                                android:id="@+id/tvPhotoPlaceholderSub"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="Select a photo from your gallery"
@@ -303,7 +411,41 @@
                                 android:fontFamily="sans-serif-medium"
                                 android:layout_marginTop="4dp" />
 
+                            <!-- Receipt image preview — shown after photo selected -->
+                            <ImageView
+                                android:id="@+id/ivReceiptPreview"
+                                android:layout_width="match_parent"
+                                android:layout_height="150dp"
+                                android:scaleType="centerCrop"
+                                android:visibility="gone"
+                                android:contentDescription="Receipt photo preview" />
+
+                            <!-- Confirmation label — shown after photo selected -->
+                            <TextView
+                                android:id="@+id/tvPhotoAttachedLabel"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="✅ Receipt attached — tap to change"
+                                android:textColor="@color/honey_dark"
+                                android:textSize="12sp"
+                                android:textStyle="bold"
+                                android:fontFamily="sans-serif-medium"
+                                android:layout_marginTop="6dp"
+                                android:visibility="gone" />
+
                         </LinearLayout>
+
+                        <!-- Remove photo button — shown when photo is attached -->
+                        <Button
+                            android:id="@+id/btnRemovePhoto"
+                            android:layout_width="match_parent"
+                            android:layout_height="40dp"
+                            android:text="✖ Remove Photo"
+                            android:textSize="12sp"
+                            android:visibility="gone"
+                            android:layout_marginTop="12dp"
+                            android:backgroundTint="@color/error_red"
+                            style="@style/Widget.MaterialComponents.Button" />
 
                     </LinearLayout>
 

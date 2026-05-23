@@ -12,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
 import androidx.lifecycle.lifecycleScope
 import com.gia.poe_demo.data.database.AppDatabase
+import com.gia.poe_demo.data.entities.Expense
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext

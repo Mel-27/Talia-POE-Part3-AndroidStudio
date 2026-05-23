@@ -10,6 +10,8 @@
     • Sort row: "Sort:" muted label + two 34dp CardView pills side-by-side
     • Custom date range row hidden by default (visibility=gone)
     • All RECEIPT TextViews are tappable (clickable + focusable + foreground ripple)
+    • ADDED: tvFilterRange for displaying current filter period
+    • ADDED: tvCategoryBreakdown for displaying category totals
 -->
 <androidx.coordinatorlayout.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
@@ -78,7 +80,17 @@
                     android:fontFamily="@font/fredoka_one"
                     android:layout_marginBottom="4dp" />
 
-
+                <!-- Filter range display -->
+                <TextView
+                    android:id="@+id/tvFilterRange"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="This Month"
+                    android:textColor="@color/cream"
+                    android:textSize="12sp"
+                    android:fontFamily="sans-serif-medium"
+                    android:layout_marginBottom="12dp"
+                    android:alpha="0.8" />
 
                 <!-- Stats card (honey) inside dark header -->
                 <androidx.cardview.widget.CardView
@@ -113,7 +125,7 @@
                                 android:id="@+id/tvTotalExpenses"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="R4,635"
+                                android:text="R0"
                                 android:textColor="@color/black_deep"
                                 android:textSize="22sp"
                                 android:fontFamily="@font/fredoka_one"
@@ -145,7 +157,7 @@
                                 android:id="@+id/tvTotalItems"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="8"
+                                android:text="0"
                                 android:textColor="@color/black_deep"
                                 android:textSize="22sp"
                                 android:fontFamily="@font/fredoka_one"
@@ -177,7 +189,7 @@
                                 android:id="@+id/tvAvgPerDay"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="R165"
+                                android:text="R0"
                                 android:textColor="@color/black_deep"
                                 android:textSize="22sp"
                                 android:fontFamily="@font/fredoka_one"
@@ -202,18 +214,7 @@
                 android:paddingTop="16dp"
                 android:paddingBottom="100dp">
 
-                <!-- ── Date Filter Chips — uniform 34dp height ──────── -->
-                <!--
-                    Kotlin chip switching pattern:
-                    val chips = listOf(chipThisMonth, chipLast7, chip3Months)
-                    chips.forEach { chip ->
-                        chip.setOnClickListener {
-                            chips.forEach { it.setBackgroundResource(R.drawable.tab_row_bg); it.setTextColor(...muted) }
-                            chip.setBackgroundResource(R.drawable.tab_active_bg); chip.setTextColor(...black_deep)
-                            // filter expense list by selected range
-                        }
-                    }
-                -->
+                <!-- ── Date Filter Chips — uniform 48dp height ──────── -->
                 <HorizontalScrollView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -281,6 +282,25 @@
                             android:clickable="true"
                             android:focusable="true"/>
 
+                        <!-- Custom Range chip -->
+                        <TextView
+                            android:id="@+id/chipCustomRange"
+                            android:layout_width="wrap_content"
+                            android:layout_height="48dp"
+                            android:minHeight="48dp"
+                            android:text="📅 Custom"
+                            android:gravity="center"
+                            android:textColor="@color/muted_text"
+                            android:textSize="12sp"
+                            android:textStyle="bold"
+                            android:fontFamily="sans-serif-medium"
+                            android:background="@drawable/tab_row_bg"
+                            android:paddingStart="16dp"
+                            android:paddingEnd="16dp"
+                            android:layout_marginEnd="8dp"
+                            android:clickable="true"
+                            android:focusable="true"/>
+
                     </LinearLayout>
 
                 </HorizontalScrollView>
@@ -292,6 +312,7 @@
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:gravity="center_vertical"
+                    android:visibility="gone"
                     android:layout_marginBottom="12dp">
 
                     <com.google.android.material.button.MaterialButton
@@ -301,8 +322,7 @@
                         android:layout_height="48dp"
                         android:layout_weight="1"
                         android:layout_marginEnd="8dp"
-                        android:text="@string/btn_start_date"
-                        android:contentDescription="@string/cd_start_date"
+                        android:text="Start Date"
                         android:textColor="@color/muted_text"
                         android:textSize="12sp"
                         android:fontFamily="sans-serif-medium"
@@ -313,7 +333,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="&#8594;"
+                        android:text="→"
                         android:textColor="@color/muted_text"
                         android:textSize="16sp"
                         android:layout_marginEnd="8dp" />
@@ -325,7 +345,7 @@
                         android:layout_height="48dp"
                         android:minHeight="48dp"
                         android:layout_weight="1"
-                        android:text="&#128197; End date"
+                        android:text="End Date"
                         android:textColor="@color/muted_text"
                         android:textSize="12sp"
                         android:fontFamily="sans-serif-medium"
@@ -335,8 +355,38 @@
 
                 </LinearLayout>
 
-                <!-- ── Add Category Banner — full-width outlined button ── -->
-                <!-- Kotlin: btnAddCategory.setOnClickListener { startActivity(Intent(this, AddCategoryActivity::class.java)) } -->
+                <!-- Category Totals Section -->
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Category Totals"
+                    android:textColor="@color/black_deep"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:fontFamily="sans-serif-medium"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="8dp" />
+
+                <androidx.cardview.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="2dp"
+                    app:cardBackgroundColor="@color/white">
+
+                    <TextView
+                        android:id="@+id/tvCategoryBreakdown"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:padding="14dp"
+                        android:text="No expenses in this period"
+                        android:textColor="@color/black_deep"
+                        android:textSize="13sp"
+                        android:fontFamily="sans-serif-medium" />
+                </androidx.cardview.widget.CardView>
+
+                <!--  Category Banner — full-width outlined button -->
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnAddCategory"
                     style="@style/Widget.MaterialComponents.Button.OutlinedButton"
@@ -389,7 +439,7 @@
                             android:id="@+id/tvSortDesc"
                             android:layout_width="wrap_content"
                             android:layout_height="match_parent"
-                            android:text="&#8595; Newest First"
+                            android:text="↓ Newest First"
                             android:gravity="center"
                             android:textColor="@color/black_deep"
                             android:textSize="12sp"
@@ -416,7 +466,7 @@
                             android:id="@+id/tvSortAsc"
                             android:layout_width="wrap_content"
                             android:layout_height="match_parent"
-                            android:text="&#8593; Oldest First"
+                            android:text="↑ Oldest First"
                             android:gravity="center"
                             android:textColor="@color/muted_text"
                             android:textSize="12sp"
@@ -452,240 +502,53 @@
                         android:layout_marginStart="10dp" />
                 </LinearLayout>
 
-                <!-- Expense 1: Woolworths -->
+                <!-- Dynamic expense cards will be inserted here by Kotlin code -->
+                <LinearLayout
+                    android:id="@+id/dynamicExpenseContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical" />
+
+                <!-- Static placeholder cards (hidden, replaced by dynamic content) -->
                 <androidx.cardview.widget.CardView
                     android:id="@+id/cardExpense1"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="10dp"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:foreground="?attr/selectableItemBackground"
+                    android:visibility="gone"
                     app:cardCornerRadius="18dp"
                     app:cardElevation="4dp"
-                    app:cardBackgroundColor="@color/white">
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical"
-                        android:padding="16dp">
-                        <androidx.cardview.widget.CardView
-                            android:layout_width="44dp" android:layout_height="44dp"
-                            app:cardCornerRadius="14dp" app:cardElevation="0dp"
-                            app:cardBackgroundColor="#FFF3D0">
-                            <TextView android:layout_width="match_parent" android:layout_height="match_parent"
-                                android:text="&#128722;" android:gravity="center" android:textSize="22sp"/>
-                        </androidx.cardview.widget.CardView>
-                        <LinearLayout
-                            android:layout_width="0dp" android:layout_height="wrap_content"
-                            android:layout_weight="1" android:layout_marginStart="12dp"
-                            android:orientation="vertical">
-                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                                android:text="Woolworths" android:textColor="@color/black_deep"
-                                android:textSize="14sp" android:textStyle="bold" android:fontFamily="sans-serif-medium"/>
-                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                                android:text="Groceries · 10:30 AM" android:textColor="@color/muted_text"
-                                android:textSize="11sp" android:fontFamily="sans-serif-medium"/>
-                        </LinearLayout>
-                        <LinearLayout
-                            android:layout_width="wrap_content" android:layout_height="wrap_content"
-                            android:orientation="vertical" android:gravity="end">
-                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                                android:text="-R 450" android:textColor="@color/error_red"
-                                android:textSize="17sp" android:fontFamily="@font/fredoka_one"/>
-                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                                android:text="Today" android:textColor="@color/muted_text"
-                                android:textSize="10sp" android:fontFamily="sans-serif-medium"/>
-                            <TextView
-                                android:id="@+id/tvReceipt1"
-                                android:layout_width="wrap_content" android:layout_height="wrap_content"
-                                android:text="&#128206; RECEIPT"
-                                android:textColor="@color/honey_dark" android:textSize="11sp"
-                                android:textStyle="bold" android:fontFamily="sans-serif-medium"
-                                android:layout_marginTop="3dp" android:layout_gravity="end"
-                                android:clickable="true" android:focusable="true"
-                                android:foreground="?attr/selectableItemBackground"
-                                android:padding="4dp"/>
-                        </LinearLayout>
-                    </LinearLayout>
-                </androidx.cardview.widget.CardView>
+                    app:cardBackgroundColor="@color/white" />
 
-                <!-- Expense 2: McDonald's -->
                 <androidx.cardview.widget.CardView
                     android:id="@+id/cardExpense2"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="16dp"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:foreground="?attr/selectableItemBackground"
+                    android:visibility="gone"
                     app:cardCornerRadius="18dp"
                     app:cardElevation="4dp"
-                    app:cardBackgroundColor="@color/white">
-                    <LinearLayout
-                        android:layout_width="match_parent" android:layout_height="wrap_content"
-                        android:orientation="horizontal" android:gravity="center_vertical" android:padding="16dp">
-                        <androidx.cardview.widget.CardView
-                            android:layout_width="44dp" android:layout_height="44dp"
-                            app:cardCornerRadius="14dp" app:cardElevation="0dp" app:cardBackgroundColor="#FFF3D0">
-                            <TextView android:layout_width="match_parent" android:layout_height="match_parent"
-                                android:text="&#127828;" android:gravity="center" android:textSize="22sp"/>
-                        </androidx.cardview.widget.CardView>
-                        <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
-                            android:layout_weight="1" android:layout_marginStart="12dp" android:orientation="vertical">
-                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                                android:text="McDonald&apos;s" android:textColor="@color/black_deep"
-                                android:textSize="14sp" android:textStyle="bold" android:fontFamily="sans-serif-medium"/>
-                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                                android:text="Dining Out · 1:15 PM" android:textColor="@color/muted_text"
-                                android:textSize="11sp" android:fontFamily="sans-serif-medium"/>
-                        </LinearLayout>
-                        <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content"
-                            android:orientation="vertical" android:gravity="end">
-                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                                android:text="-R 85" android:textColor="@color/error_red"
-                                android:textSize="17sp" android:fontFamily="@font/fredoka_one"/>
-                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                                android:text="Today" android:textColor="@color/muted_text"
-                                android:textSize="10sp" android:fontFamily="sans-serif-medium"/>
-                            <TextView
-                                android:id="@+id/tvReceipt2"
-                                android:layout_width="wrap_content" android:layout_height="wrap_content"
-                                android:text="&#128206; RECEIPT"
-                                android:textColor="@color/honey_dark" android:textSize="11sp"
-                                android:textStyle="bold" android:fontFamily="sans-serif-medium"
-                                android:layout_marginTop="3dp" android:layout_gravity="end"
-                                android:clickable="true" android:focusable="true"
-                                android:foreground="?attr/selectableItemBackground"
-                                android:padding="4dp"/>
-                        </LinearLayout>
-                    </LinearLayout>
-                </androidx.cardview.widget.CardView>
+                    app:cardBackgroundColor="@color/white" />
 
-                <!-- ── DATE SECTION: YESTERDAY ──────────────────────── -->
-                <LinearLayout
-                    android:layout_width="match_parent" android:layout_height="wrap_content"
-                    android:orientation="horizontal" android:gravity="center_vertical"
-                    android:layout_marginBottom="10dp">
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                        android:text="YESTERDAY" android:textColor="@color/muted_text" android:textSize="11sp"
-                        android:textStyle="bold" android:fontFamily="sans-serif-medium" android:letterSpacing="0.1"/>
-                    <View android:layout_width="0dp" android:layout_height="1dp" android:layout_weight="1"
-                        android:background="@color/input_stroke" android:layout_marginStart="10dp"/>
-                </LinearLayout>
-
-                <!-- Expense 3: Uber -->
                 <androidx.cardview.widget.CardView
                     android:id="@+id/cardExpense3"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="16dp"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:foreground="?attr/selectableItemBackground"
+                    android:visibility="gone"
                     app:cardCornerRadius="18dp"
                     app:cardElevation="4dp"
-                    app:cardBackgroundColor="@color/white">
-                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
-                        android:orientation="horizontal" android:gravity="center_vertical" android:padding="16dp">
-                        <androidx.cardview.widget.CardView android:layout_width="44dp" android:layout_height="44dp"
-                            app:cardCornerRadius="14dp" app:cardElevation="0dp" app:cardBackgroundColor="#E4F7FF">
-                            <TextView android:layout_width="match_parent" android:layout_height="match_parent"
-                                android:text="&#128663;" android:gravity="center" android:textSize="22sp"/>
-                        </androidx.cardview.widget.CardView>
-                        <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
-                            android:layout_weight="1" android:layout_marginStart="12dp" android:orientation="vertical">
-                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                                android:text="Uber" android:textColor="@color/black_deep"
-                                android:textSize="14sp" android:textStyle="bold" android:fontFamily="sans-serif-medium"/>
-                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                                android:text="Transport · 8:30 PM" android:textColor="@color/muted_text"
-                                android:textSize="11sp" android:fontFamily="sans-serif-medium"/>
-                        </LinearLayout>
-                        <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content"
-                            android:orientation="vertical" android:gravity="end">
-                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                                android:text="-R 65" android:textColor="@color/error_red"
-                                android:textSize="17sp" android:fontFamily="@font/fredoka_one"/>
-                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                                android:text="Yesterday" android:textColor="@color/muted_text"
-                                android:textSize="10sp" android:fontFamily="sans-serif-medium"/>
-                            <TextView
-                                android:id="@+id/tvReceipt3"
-                                android:layout_width="wrap_content" android:layout_height="wrap_content"
-                                android:text="&#128206; RECEIPT"
-                                android:textColor="@color/honey_dark" android:textSize="11sp"
-                                android:textStyle="bold" android:fontFamily="sans-serif-medium"
-                                android:layout_marginTop="3dp" android:layout_gravity="end"
-                                android:clickable="true" android:focusable="true"
-                                android:foreground="?attr/selectableItemBackground"
-                                android:padding="4dp"/>
-                        </LinearLayout>
-                    </LinearLayout>
-                </androidx.cardview.widget.CardView>
+                    app:cardBackgroundColor="@color/white" />
 
-                <!-- ── DATE SECTION: FEB 28 ──────────────────────────── -->
-                <LinearLayout
-                    android:layout_width="match_parent" android:layout_height="wrap_content"
-                    android:orientation="horizontal" android:gravity="center_vertical"
-                    android:layout_marginBottom="10dp">
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                        android:text="FEB 28" android:textColor="@color/muted_text" android:textSize="11sp"
-                        android:textStyle="bold" android:fontFamily="sans-serif-medium" android:letterSpacing="0.1"/>
-                    <View android:layout_width="0dp" android:layout_height="1dp" android:layout_weight="1"
-                        android:background="@color/input_stroke" android:layout_marginStart="10dp"/>
-                </LinearLayout>
-
-                <!-- Expense 4: Cinema -->
                 <androidx.cardview.widget.CardView
                     android:id="@+id/cardExpense4"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="10dp"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:foreground="?attr/selectableItemBackground"
+                    android:visibility="gone"
                     app:cardCornerRadius="18dp"
                     app:cardElevation="4dp"
-                    app:cardBackgroundColor="@color/white">
-                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
-                        android:orientation="horizontal" android:gravity="center_vertical" android:padding="16dp">
-                        <androidx.cardview.widget.CardView android:layout_width="44dp" android:layout_height="44dp"
-                            app:cardCornerRadius="14dp" app:cardElevation="0dp" app:cardBackgroundColor="#F0E6FF">
-                            <TextView android:layout_width="match_parent" android:layout_height="match_parent"
-                                android:text="&#127916;" android:gravity="center" android:textSize="22sp"/>
-                        </androidx.cardview.widget.CardView>
-                        <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
-                            android:layout_weight="1" android:layout_marginStart="12dp" android:orientation="vertical">
-                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                                android:text="Cinema" android:textColor="@color/black_deep"
-                                android:textSize="14sp" android:textStyle="bold" android:fontFamily="sans-serif-medium"/>
-                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                                android:text="Entertainment · 7:45 PM" android:textColor="@color/muted_text"
-                                android:textSize="11sp" android:fontFamily="sans-serif-medium"/>
-                        </LinearLayout>
-                        <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content"
-                            android:orientation="vertical" android:gravity="end">
-                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                                android:text="-R 220" android:textColor="@color/error_red"
-                                android:textSize="17sp" android:fontFamily="@font/fredoka_one"/>
-                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                                android:text="Feb 28" android:textColor="@color/muted_text"
-                                android:textSize="10sp" android:fontFamily="sans-serif-medium"/>
-                            <TextView
-                                android:id="@+id/tvReceipt4"
-                                android:layout_width="wrap_content" android:layout_height="wrap_content"
-                                android:text="&#128206; RECEIPT"
-                                android:textColor="@color/honey_dark" android:textSize="11sp"
-                                android:textStyle="bold" android:fontFamily="sans-serif-medium"
-                                android:layout_marginTop="3dp" android:layout_gravity="end"
-                                android:clickable="true" android:focusable="true"
-                                android:foreground="?attr/selectableItemBackground"
-                                android:padding="4dp"/>
-                        </LinearLayout>
-                    </LinearLayout>
-                </androidx.cardview.widget.CardView>
+                    app:cardBackgroundColor="@color/white" />
 
             </LinearLayout>
 
@@ -713,7 +576,7 @@
             <androidx.cardview.widget.CardView android:layout_width="44dp" android:layout_height="44dp"
                 app:cardCornerRadius="14dp" app:cardElevation="0dp" app:cardBackgroundColor="@android:color/transparent">
                 <TextView android:layout_width="match_parent" android:layout_height="match_parent"
-                    android:text="&#127968;" android:gravity="center" android:textSize="20sp"/>
+                    android:text="🏠" android:gravity="center" android:textSize="20sp"/>
             </androidx.cardview.widget.CardView>
             <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
                 android:text="Home" android:textSize="10sp" android:textStyle="bold"
@@ -727,7 +590,7 @@
             <androidx.cardview.widget.CardView android:layout_width="44dp" android:layout_height="44dp"
                 app:cardCornerRadius="14dp" app:cardElevation="0dp" app:cardBackgroundColor="#FFD454">
                 <TextView android:layout_width="match_parent" android:layout_height="match_parent"
-                    android:text="&#128203;" android:gravity="center" android:textSize="20sp"/>
+                    android:text="📃" android:gravity="center" android:textSize="20sp"/>
             </androidx.cardview.widget.CardView>
             <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
                 android:text="Expenses" android:textSize="10sp" android:textStyle="bold"
@@ -753,7 +616,7 @@
             <androidx.cardview.widget.CardView android:layout_width="44dp" android:layout_height="44dp"
                 app:cardCornerRadius="14dp" app:cardElevation="0dp" app:cardBackgroundColor="@android:color/transparent">
                 <TextView android:layout_width="match_parent" android:layout_height="match_parent"
-                    android:text="&#127919;" android:gravity="center" android:textSize="20sp"/>
+                    android:text="🎯" android:gravity="center" android:textSize="20sp"/>
             </androidx.cardview.widget.CardView>
             <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
                 android:text="Goals" android:textSize="10sp" android:textStyle="bold"
@@ -767,7 +630,7 @@
             <androidx.cardview.widget.CardView android:layout_width="44dp" android:layout_height="44dp"
                 app:cardCornerRadius="14dp" app:cardElevation="0dp" app:cardBackgroundColor="@android:color/transparent">
                 <TextView android:layout_width="match_parent" android:layout_height="match_parent"
-                    android:text="&#127942;" android:gravity="center" android:textSize="20sp"/>
+                    android:text="🏆" android:gravity="center" android:textSize="20sp"/>
             </androidx.cardview.widget.CardView>
             <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
                 android:text="Badges" android:textSize="10sp" android:textStyle="bold"

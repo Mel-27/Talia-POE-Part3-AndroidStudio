@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
+
+<!-- CoordinatorLayout used as the root layout to support the floating bottom nav
+     ref: https://developer.android.com/reference/androidx/coordinatorlayout/widget/CoordinatorLayout -->
 <androidx.coordinatorlayout.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -6,6 +9,8 @@
     android:layout_height="match_parent"
     android:background="@color/cream">
 
+    <!-- ScrollView so the whole screen scrolls if content overflows
+         ref: https://developer.android.com/reference/android/widget/ScrollView -->
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -17,7 +22,8 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <!-- CREAM TOP BAR — Logo + App Name (matches dashboard) -->
+            <!-- cream top bar with logo and app name matching the dashboard style
+                 ref: https://developer.android.com/guide/topics/ui/layout/linear -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
@@ -27,6 +33,8 @@
                 android:paddingStart="18dp"
                 android:paddingEnd="18dp">
 
+                <!-- app logo using ImageView with a content description for accessibility
+                     ref: https://developer.android.com/reference/android/widget/ImageView -->
                 <ImageView
                     android:layout_width="34dp"
                     android:layout_height="34dp"
@@ -45,7 +53,9 @@
 
             </LinearLayout>
 
-            <!-- DARK HERO HEADER -->
+            <!-- dark hero header with honey points balance card
+                 RelativeLayout used so the card can sit below the title row
+                 ref: https://developer.android.com/reference/android/widget/RelativeLayout -->
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -70,11 +80,10 @@
                         android:textSize="28sp"
                         android:fontFamily="@font/fredoka_one" />
 
-
-
                 </LinearLayout>
 
-                <!-- Honey Points balance card -->
+                <!-- honey points balance card using CardView with a progress bar for next badge
+                     ref: https://developer.android.com/reference/androidx/cardview/widget/CardView -->
                 <androidx.cardview.widget.CardView
                     android:id="@+id/honeyPointsCard"
                     android:layout_width="match_parent"
@@ -105,11 +114,13 @@
                             android:letterSpacing="0.08"
                             android:gravity="center" />
 
+                        <!-- honey points value gets updated dynamically from the activity
+                             ref: https://developer.android.com/training/data-storage/room/accessing-data -->
                         <TextView
                             android:id="@+id/tvHoneyPoints"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="200 🍯"
+                            android:text="0 🍯"
                             android:textColor="@color/black_deep"
                             android:textSize="42sp"
                             android:fontFamily="@font/fredoka_one"
@@ -117,9 +128,10 @@
                             android:layout_marginTop="4dp" />
 
                         <TextView
+                            android:id="@+id/tvNextBadgeSubtitle"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="50 pts to Honey Collector"
+                            android:text=""
                             android:textColor="#88291A00"
                             android:textSize="12sp"
                             android:fontFamily="sans-serif-medium"
@@ -127,7 +139,6 @@
                             android:layout_marginTop="4dp"
                             android:layout_marginBottom="16dp" />
 
-                        <!-- Progress row -->
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
@@ -144,9 +155,10 @@
                                 android:fontFamily="sans-serif-medium" />
 
                             <TextView
+                                android:id="@+id/tvProgressLabel"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="200 / 250 pts"
+                                android:text=""
                                 android:textColor="#CC291A00"
                                 android:textSize="11sp"
                                 android:textStyle="bold"
@@ -154,12 +166,14 @@
 
                         </LinearLayout>
 
+                        <!-- horizontal ProgressBar showing progress to the next badge
+                             ref: https://developer.android.com/reference/android/widget/ProgressBar -->
                         <ProgressBar
                             android:id="@+id/progressNextBadge"
                             style="?android:attr/progressBarStyleHorizontal"
                             android:layout_width="match_parent"
                             android:layout_height="12dp"
-                            android:progress="80"
+                            android:progress="0"
                             android:progressDrawable="@drawable/progress_dark"
                             android:indeterminate="false" />
 
@@ -169,7 +183,8 @@
 
             </RelativeLayout>
 
-            <!-- BODY -->
+            <!-- body section with badge grid and how to earn points card
+                 ref: https://developer.android.com/guide/topics/ui/layout/linear -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -188,15 +203,18 @@
                     android:fontFamily="@font/fredoka_one"
                     android:layout_marginBottom="14dp" />
 
-                <!-- Badge row 1 -->
+                <!-- badge grid using horizontal LinearLayouts with layout_weight for equal sizing
+                     ref: https://developer.android.com/guide/topics/ui/layout/linear#Weight -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:layout_marginBottom="12dp">
 
-                    <!-- Badge 1: Worker Bee — EARNED -->
+                    <!-- Worker Bee badge — earned, full opacity
+                         ref: https://developer.android.com/reference/androidx/cardview/widget/CardView -->
                     <androidx.cardview.widget.CardView
+                        android:id="@+id/cardBadge1"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
@@ -204,26 +222,54 @@
                         app:cardCornerRadius="18dp"
                         app:cardElevation="4dp"
                         app:cardBackgroundColor="@color/white">
-                        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
-                            android:orientation="vertical" android:gravity="center" android:padding="16dp">
-                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                                android:text="✓ Earned" android:textColor="@color/success_green"
-                                android:textSize="11sp" android:textStyle="bold"
-                                android:fontFamily="sans-serif-medium" android:layout_gravity="end"
-                                android:layout_marginBottom="6dp"/>
-                            <ImageView android:layout_width="110dp" android:layout_height="110dp"
-                                android:src="@drawable/worker_bee" android:scaleType="fitCenter"
-                                android:layout_gravity="center"/>
-                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                                android:text="100 pts" android:textColor="@color/honey_dark"
-                                android:textSize="11sp" android:textStyle="bold"
-                                android:fontFamily="sans-serif-medium" android:gravity="center"
-                                android:layout_marginTop="8dp"/>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:gravity="center"
+                            android:padding="16dp">
+
+
+
+                            <TextView
+                                android:id="@+id/tvNextBadgeLabel"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Badge Earned!"
+                                android:textColor="#88291A00"
+                                android:textSize="12sp"
+                                android:fontFamily="sans-serif-medium"
+                                android:gravity="center"
+                                android:layout_marginTop="4dp"
+                                android:layout_marginBottom="16dp"/>
+
+                            <ImageView
+                                android:layout_width="110dp"
+                                android:layout_height="110dp"
+                                android:src="@drawable/worker_bee"
+                                android:scaleType="fitCenter"
+                                android:layout_gravity="center" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="100 pts"
+                                android:textColor="@color/honey_dark"
+                                android:textSize="11sp"
+                                android:textStyle="bold"
+                                android:fontFamily="sans-serif-medium"
+                                android:gravity="center"
+                                android:layout_marginTop="8dp" />
+
                         </LinearLayout>
+
                     </androidx.cardview.widget.CardView>
 
-                    <!-- Badge 2: Honey Collector — LOCKED -->
+                    <!-- Honey Collector badge — locked, reduced opacity using android:alpha
+                         ref: https://developer.android.com/reference/android/view/View#attr_android:alpha -->
                     <androidx.cardview.widget.CardView
+                        android:id="@+id/cardBadge2"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
@@ -232,35 +278,59 @@
                         app:cardCornerRadius="18dp"
                         app:cardElevation="4dp"
                         app:cardBackgroundColor="@color/white">
-                        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
-                            android:orientation="vertical" android:gravity="center" android:padding="16dp">
-                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                                android:text="🔒 Locked" android:textColor="@color/muted_text"
-                                android:textSize="11sp" android:textStyle="bold"
-                                android:fontFamily="sans-serif-medium" android:layout_gravity="end"
-                                android:layout_marginBottom="6dp"/>
-                            <ImageView android:layout_width="110dp" android:layout_height="110dp"
-                                android:src="@drawable/honey_collector" android:scaleType="fitCenter"
-                                android:layout_gravity="center"/>
-                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                                android:text="250 pts" android:textColor="@color/muted_text"
-                                android:textSize="11sp" android:textStyle="bold"
-                                android:fontFamily="sans-serif-medium" android:gravity="center"
-                                android:layout_marginTop="8dp"/>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:gravity="center"
+                            android:padding="16dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="🔒 Locked"
+                                android:textColor="@color/muted_text"
+                                android:textSize="11sp"
+                                android:textStyle="bold"
+                                android:fontFamily="sans-serif-medium"
+                                android:layout_gravity="end"
+                                android:layout_marginBottom="6dp" />
+
+                            <ImageView
+                                android:layout_width="110dp"
+                                android:layout_height="110dp"
+                                android:src="@drawable/honey_collector"
+                                android:scaleType="fitCenter"
+                                android:layout_gravity="center" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="250 pts"
+                                android:textColor="@color/muted_text"
+                                android:textSize="11sp"
+                                android:textStyle="bold"
+                                android:fontFamily="sans-serif-medium"
+                                android:gravity="center"
+                                android:layout_marginTop="8dp" />
+
                         </LinearLayout>
+
                     </androidx.cardview.widget.CardView>
 
                 </LinearLayout>
 
-                <!-- Badge row 2 -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:layout_marginBottom="20dp">
 
-                    <!-- Badge 3: Honey Hoarder — LOCKED -->
+                    <!-- Honey Hoarder badge — locked
+                         ref: https://developer.android.com/reference/androidx/cardview/widget/CardView -->
                     <androidx.cardview.widget.CardView
+                        android:id="@+id/cardBadge3"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
@@ -269,26 +339,51 @@
                         app:cardCornerRadius="18dp"
                         app:cardElevation="4dp"
                         app:cardBackgroundColor="@color/white">
-                        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
-                            android:orientation="vertical" android:gravity="center" android:padding="16dp">
-                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                                android:text="🔒 Locked" android:textColor="@color/muted_text"
-                                android:textSize="11sp" android:textStyle="bold"
-                                android:fontFamily="sans-serif-medium" android:layout_gravity="end"
-                                android:layout_marginBottom="6dp"/>
-                            <ImageView android:layout_width="110dp" android:layout_height="110dp"
-                                android:src="@drawable/honey_hoarder" android:scaleType="fitCenter"
-                                android:layout_gravity="center"/>
-                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                                android:text="500 pts" android:textColor="@color/muted_text"
-                                android:textSize="11sp" android:textStyle="bold"
-                                android:fontFamily="sans-serif-medium" android:gravity="center"
-                                android:layout_marginTop="8dp"/>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:gravity="center"
+                            android:padding="16dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="🔒 Locked"
+                                android:textColor="@color/muted_text"
+                                android:textSize="11sp"
+                                android:textStyle="bold"
+                                android:fontFamily="sans-serif-medium"
+                                android:layout_gravity="end"
+                                android:layout_marginBottom="6dp" />
+
+                            <ImageView
+                                android:layout_width="110dp"
+                                android:layout_height="110dp"
+                                android:src="@drawable/honey_hoarder"
+                                android:scaleType="fitCenter"
+                                android:layout_gravity="center" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="500 pts"
+                                android:textColor="@color/muted_text"
+                                android:textSize="11sp"
+                                android:textStyle="bold"
+                                android:fontFamily="sans-serif-medium"
+                                android:gravity="center"
+                                android:layout_marginTop="8dp" />
+
                         </LinearLayout>
+
                     </androidx.cardview.widget.CardView>
 
-                    <!-- Badge 4: Queen Bee — LOCKED -->
+                    <!-- Queen Bee badge — locked
+                         ref: https://developer.android.com/reference/androidx/cardview/widget/CardView -->
                     <androidx.cardview.widget.CardView
+                        android:id="@+id/cardBadge4"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
@@ -297,27 +392,49 @@
                         app:cardCornerRadius="18dp"
                         app:cardElevation="4dp"
                         app:cardBackgroundColor="@color/white">
-                        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
-                            android:orientation="vertical" android:gravity="center" android:padding="16dp">
-                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                                android:text="🔒 Locked" android:textColor="@color/muted_text"
-                                android:textSize="11sp" android:textStyle="bold"
-                                android:fontFamily="sans-serif-medium" android:layout_gravity="end"
-                                android:layout_marginBottom="6dp"/>
-                            <ImageView android:layout_width="110dp" android:layout_height="110dp"
-                                android:src="@drawable/queen_bee" android:scaleType="fitCenter"
-                                android:layout_gravity="center"/>
-                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                                android:text="1,000 pts" android:textColor="@color/muted_text"
-                                android:textSize="11sp" android:textStyle="bold"
-                                android:fontFamily="sans-serif-medium" android:gravity="center"
-                                android:layout_marginTop="8dp"/>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:gravity="center"
+                            android:padding="16dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="🔒 Locked"
+                                android:textColor="@color/muted_text"
+                                android:textSize="11sp"
+                                android:textStyle="bold"
+                                android:fontFamily="sans-serif-medium"
+                                android:layout_gravity="end"
+                                android:layout_marginBottom="6dp" />
+
+                            <ImageView
+                                android:layout_width="110dp"
+                                android:layout_height="110dp"
+                                android:src="@drawable/queen_bee"
+                                android:scaleType="fitCenter"
+                                android:layout_gravity="center" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="1,000 pts"
+                                android:textColor="@color/muted_text"
+                                android:textSize="11sp"
+                                android:textStyle="bold"
+                                android:fontFamily="sans-serif-medium"
+                                android:gravity="center"
+                                android:layout_marginTop="8dp" />
+
                         </LinearLayout>
+
                     </androidx.cardview.widget.CardView>
 
                 </LinearLayout>
 
-                <!-- HOW TO EARN POINTS -->
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -327,6 +444,8 @@
                     android:fontFamily="@font/fredoka_one"
                     android:layout_marginBottom="12dp" />
 
+                <!-- CardView wrapping the how to earn points list
+                     ref: https://developer.android.com/reference/androidx/cardview/widget/CardView -->
                 <androidx.cardview.widget.CardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -334,84 +453,210 @@
                     app:cardElevation="4dp"
                     app:cardBackgroundColor="@color/white">
 
-                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
-                        android:orientation="vertical" android:padding="18dp">
+                    <!-- each row uses a small CardView icon, label and points value
+                         dividers are plain Views with a 1dp height
+                         ref: https://developer.android.com/guide/topics/ui/layout/linear -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="18dp">
 
-                        <!-- Row 1 -->
-                        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
-                            android:orientation="horizontal" android:gravity="center_vertical" android:paddingBottom="14dp">
-                            <androidx.cardview.widget.CardView android:layout_width="40dp" android:layout_height="40dp"
-                                app:cardCornerRadius="13dp" app:cardElevation="0dp" app:cardBackgroundColor="#FFF3D0">
-                                <TextView android:layout_width="match_parent" android:layout_height="match_parent"
-                                    android:text="📝" android:gravity="center" android:textSize="20sp"/>
+                        <!-- row 1: add an expense -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:paddingBottom="14dp">
+
+                            <androidx.cardview.widget.CardView
+                                android:layout_width="40dp"
+                                android:layout_height="40dp"
+                                app:cardCornerRadius="13dp"
+                                app:cardElevation="0dp"
+                                app:cardBackgroundColor="#FFF3D0">
+
+                                <TextView
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:text="📝"
+                                    android:gravity="center"
+                                    android:textSize="20sp" />
+
                             </androidx.cardview.widget.CardView>
-                            <TextView android:layout_width="0dp" android:layout_height="wrap_content"
-                                android:layout_weight="1" android:layout_marginStart="12dp"
-                                android:text="Add an expense" android:textColor="@color/black_deep"
-                                android:textSize="13sp" android:textStyle="bold" android:fontFamily="sans-serif-medium"/>
-                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                                android:text="+5 pts" android:textColor="@color/honey_dark"
-                                android:textSize="14sp" android:fontFamily="@font/fredoka_one"/>
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:layout_marginStart="12dp"
+                                android:text="Add an expense"
+                                android:textColor="@color/black_deep"
+                                android:textSize="13sp"
+                                android:textStyle="bold"
+                                android:fontFamily="sans-serif-medium" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="+5 pts"
+                                android:textColor="@color/honey_dark"
+                                android:textSize="14sp"
+                                android:fontFamily="@font/fredoka_one" />
+
                         </LinearLayout>
 
-                        <View android:layout_width="match_parent" android:layout_height="1dp"
-                            android:background="@color/input_stroke" android:layout_marginBottom="14dp"/>
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:background="@color/input_stroke"
+                            android:layout_marginBottom="14dp" />
 
-                        <!-- Row 2 -->
-                        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
-                            android:orientation="horizontal" android:gravity="center_vertical" android:paddingBottom="14dp">
-                            <androidx.cardview.widget.CardView android:layout_width="40dp" android:layout_height="40dp"
-                                app:cardCornerRadius="13dp" app:cardElevation="0dp" app:cardBackgroundColor="#E8F5E9">
-                                <TextView android:layout_width="match_parent" android:layout_height="match_parent"
-                                    android:text="✅" android:gravity="center" android:textSize="20sp"/>
+                        <!-- row 2: stay within daily budget -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:paddingBottom="14dp">
+
+                            <androidx.cardview.widget.CardView
+                                android:layout_width="40dp"
+                                android:layout_height="40dp"
+                                app:cardCornerRadius="13dp"
+                                app:cardElevation="0dp"
+                                app:cardBackgroundColor="#E8F5E9">
+
+                                <TextView
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:text="✅"
+                                    android:gravity="center"
+                                    android:textSize="20sp" />
+
                             </androidx.cardview.widget.CardView>
-                            <TextView android:layout_width="0dp" android:layout_height="wrap_content"
-                                android:layout_weight="1" android:layout_marginStart="12dp"
-                                android:text="Stay within daily budget" android:textColor="@color/black_deep"
-                                android:textSize="13sp" android:textStyle="bold" android:fontFamily="sans-serif-medium"/>
-                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                                android:text="+10 pts" android:textColor="@color/honey_dark"
-                                android:textSize="14sp" android:fontFamily="@font/fredoka_one"/>
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:layout_marginStart="12dp"
+                                android:text="Stay within daily budget"
+                                android:textColor="@color/black_deep"
+                                android:textSize="13sp"
+                                android:textStyle="bold"
+                                android:fontFamily="sans-serif-medium" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="+10 pts"
+                                android:textColor="@color/honey_dark"
+                                android:textSize="14sp"
+                                android:fontFamily="@font/fredoka_one" />
+
                         </LinearLayout>
 
-                        <View android:layout_width="match_parent" android:layout_height="1dp"
-                            android:background="@color/input_stroke" android:layout_marginBottom="14dp"/>
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:background="@color/input_stroke"
+                            android:layout_marginBottom="14dp" />
 
-                        <!-- Row 3 -->
-                        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
-                            android:orientation="horizontal" android:gravity="center_vertical" android:paddingBottom="14dp">
-                            <androidx.cardview.widget.CardView android:layout_width="40dp" android:layout_height="40dp"
-                                app:cardCornerRadius="13dp" app:cardElevation="0dp" app:cardBackgroundColor="#FFF3D0">
-                                <TextView android:layout_width="match_parent" android:layout_height="match_parent"
-                                    android:text="🔥" android:gravity="center" android:textSize="20sp"/>
+                        <!-- row 3: log expenses 5 days in a row -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:paddingBottom="14dp">
+
+                            <androidx.cardview.widget.CardView
+                                android:layout_width="40dp"
+                                android:layout_height="40dp"
+                                app:cardCornerRadius="13dp"
+                                app:cardElevation="0dp"
+                                app:cardBackgroundColor="#FFF3D0">
+
+                                <TextView
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:text="🔥"
+                                    android:gravity="center"
+                                    android:textSize="20sp" />
+
                             </androidx.cardview.widget.CardView>
-                            <TextView android:layout_width="0dp" android:layout_height="wrap_content"
-                                android:layout_weight="1" android:layout_marginStart="12dp"
-                                android:text="Log expenses 5 days in a row" android:textColor="@color/black_deep"
-                                android:textSize="13sp" android:textStyle="bold" android:fontFamily="sans-serif-medium"/>
-                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                                android:text="+20 pts" android:textColor="@color/honey_dark"
-                                android:textSize="14sp" android:fontFamily="@font/fredoka_one"/>
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:layout_marginStart="12dp"
+                                android:text="Log expenses 5 days in a row"
+                                android:textColor="@color/black_deep"
+                                android:textSize="13sp"
+                                android:textStyle="bold"
+                                android:fontFamily="sans-serif-medium" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="+20 pts"
+                                android:textColor="@color/honey_dark"
+                                android:textSize="14sp"
+                                android:fontFamily="@font/fredoka_one" />
+
                         </LinearLayout>
 
-                        <View android:layout_width="match_parent" android:layout_height="1dp"
-                            android:background="@color/input_stroke" android:layout_marginBottom="14dp"/>
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:background="@color/input_stroke"
+                            android:layout_marginBottom="14dp" />
 
-                        <!-- Row 4 -->
-                        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
-                            android:orientation="horizontal" android:gravity="center_vertical">
-                            <androidx.cardview.widget.CardView android:layout_width="40dp" android:layout_height="40dp"
-                                app:cardCornerRadius="13dp" app:cardElevation="0dp" app:cardBackgroundColor="#E8F5E9">
-                                <TextView android:layout_width="match_parent" android:layout_height="match_parent"
-                                    android:text="🎯" android:gravity="center" android:textSize="20sp"/>
+                        <!-- row 4: meet your savings goal -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical">
+
+                            <androidx.cardview.widget.CardView
+                                android:layout_width="40dp"
+                                android:layout_height="40dp"
+                                app:cardCornerRadius="13dp"
+                                app:cardElevation="0dp"
+                                app:cardBackgroundColor="#E8F5E9">
+
+                                <TextView
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:text="🎯"
+                                    android:gravity="center"
+                                    android:textSize="20sp" />
+
                             </androidx.cardview.widget.CardView>
-                            <TextView android:layout_width="0dp" android:layout_height="wrap_content"
-                                android:layout_weight="1" android:layout_marginStart="12dp"
-                                android:text="Meet your savings goal" android:textColor="@color/black_deep"
-                                android:textSize="13sp" android:textStyle="bold" android:fontFamily="sans-serif-medium"/>
-                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                                android:text="+25 pts" android:textColor="@color/honey_dark"
-                                android:textSize="14sp" android:fontFamily="@font/fredoka_one"/>
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:layout_marginStart="12dp"
+                                android:text="Meet your savings goal"
+                                android:textColor="@color/black_deep"
+                                android:textSize="13sp"
+                                android:textStyle="bold"
+                                android:fontFamily="sans-serif-medium" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="+25 pts"
+                                android:textColor="@color/honey_dark"
+                                android:textSize="14sp"
+                                android:fontFamily="@font/fredoka_one" />
+
                         </LinearLayout>
 
                     </LinearLayout>
@@ -424,7 +669,9 @@
 
     </ScrollView>
 
-    <!-- BOTTOM NAV -->
+    <!-- bottom nav pinned to the bottom using layout_gravity, elevation keeps it above the scroll content
+         each nav item is wired via its id in the activity
+         ref: https://developer.android.com/training/implementing-navigation/nav-drawer -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="72dp"
@@ -435,70 +682,252 @@
         android:elevation="12dp"
         android:paddingBottom="8dp">
 
-        <LinearLayout android:id="@+id/navHome" android:layout_width="0dp" android:layout_height="match_parent"
-            android:layout_weight="1" android:orientation="vertical" android:gravity="center"
-            android:clickable="true" android:focusable="true">
-            <androidx.cardview.widget.CardView android:layout_width="44dp" android:layout_height="44dp"
-                app:cardCornerRadius="14dp" app:cardElevation="0dp" app:cardBackgroundColor="@android:color/transparent">
-                <TextView android:layout_width="match_parent" android:layout_height="match_parent"
-                    android:text="🏠" android:gravity="center" android:textSize="20sp"/>
+        <!-- home nav item wired via navHome id
+             ref: https://developer.android.com/reference/android/view/View#setOnClickListener(android.view.View.OnClickListener) -->
+        <LinearLayout
+            android:id="@+id/navHome"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:clickable="true"
+            android:focusable="true">
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                app:cardCornerRadius="14dp"
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="@android:color/transparent">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:text="🏠"
+                    android:gravity="center"
+                    android:textSize="20sp" />
+
             </androidx.cardview.widget.CardView>
-            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                android:text="Home" android:textSize="10sp" android:textStyle="bold"
-                android:textColor="@color/muted_text" android:fontFamily="sans-serif-medium" android:layout_marginTop="2dp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Home"
+                android:textSize="10sp"
+                android:textStyle="bold"
+                android:textColor="@color/muted_text"
+                android:fontFamily="sans-serif-medium"
+                android:layout_marginTop="2dp" />
+
         </LinearLayout>
 
-        <LinearLayout android:id="@+id/navExpenses" android:layout_width="0dp" android:layout_height="match_parent"
-            android:layout_weight="1" android:orientation="vertical" android:gravity="center"
-            android:clickable="true" android:focusable="true">
-            <androidx.cardview.widget.CardView android:layout_width="44dp" android:layout_height="44dp"
-                app:cardCornerRadius="14dp" app:cardElevation="0dp" app:cardBackgroundColor="@android:color/transparent">
-                <TextView android:layout_width="match_parent" android:layout_height="match_parent"
-                    android:text="📋" android:gravity="center" android:textSize="20sp"/>
+        <!-- expenses nav item wired via navExpenses id -->
+        <LinearLayout
+            android:id="@+id/navExpenses"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:clickable="true"
+            android:focusable="true">
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                app:cardCornerRadius="14dp"
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="@android:color/transparent">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:text="📋"
+                    android:gravity="center"
+                    android:textSize="20sp" />
+
             </androidx.cardview.widget.CardView>
-            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                android:text="Expenses" android:textSize="10sp" android:textStyle="bold"
-                android:textColor="@color/muted_text" android:fontFamily="sans-serif-medium" android:layout_marginTop="2dp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Expenses"
+                android:textSize="10sp"
+                android:textStyle="bold"
+                android:textColor="@color/muted_text"
+                android:fontFamily="sans-serif-medium"
+                android:layout_marginTop="2dp" />
+
         </LinearLayout>
 
-        <LinearLayout android:layout_width="0dp" android:layout_height="match_parent"
-            android:layout_weight="1" android:gravity="center">
-            <androidx.cardview.widget.CardView android:id="@+id/fabAddExpense"
-                android:layout_width="54dp" android:layout_height="54dp" android:layout_marginBottom="10dp"
-                app:cardCornerRadius="18dp" app:cardElevation="8dp" app:cardBackgroundColor="@color/honey"
-                android:clickable="true" android:focusable="true">
-                <TextView android:layout_width="match_parent" android:layout_height="match_parent"
-                    android:text="+" android:gravity="center" android:textColor="@color/black_deep"
-                    android:textSize="30sp" android:fontFamily="sans-serif-black"/>
+        <!-- centre FAB add button wired via fabAddExpense id to navigate to AddExpenseActivity
+             ref: https://developer.android.com/reference/com/google/android/material/floatingactionbutton/FloatingActionButton -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center">
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/fabAddExpense"
+                android:layout_width="54dp"
+                android:layout_height="54dp"
+                android:layout_marginBottom="10dp"
+                app:cardCornerRadius="18dp"
+                app:cardElevation="8dp"
+                app:cardBackgroundColor="@color/honey"
+                android:clickable="true"
+                android:focusable="true">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:text="+"
+                    android:gravity="center"
+                    android:textColor="@color/black_deep"
+                    android:textSize="30sp"
+                    android:fontFamily="sans-serif-black" />
+
             </androidx.cardview.widget.CardView>
+
         </LinearLayout>
 
-        <LinearLayout android:id="@+id/navGoals" android:layout_width="0dp" android:layout_height="match_parent"
-            android:layout_weight="1" android:orientation="vertical" android:gravity="center"
-            android:clickable="true" android:focusable="true">
-            <androidx.cardview.widget.CardView android:layout_width="44dp" android:layout_height="44dp"
-                app:cardCornerRadius="14dp" app:cardElevation="0dp" app:cardBackgroundColor="@android:color/transparent">
-                <TextView android:layout_width="match_parent" android:layout_height="match_parent"
-                    android:text="🎯" android:gravity="center" android:textSize="20sp"/>
+        <!-- goals nav item wired via navGoals id -->
+        <LinearLayout
+            android:id="@+id/navGoals"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:clickable="true"
+            android:focusable="true">
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                app:cardCornerRadius="14dp"
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="@android:color/transparent">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:text="🎯"
+                    android:gravity="center"
+                    android:textSize="20sp" />
+
             </androidx.cardview.widget.CardView>
-            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                android:text="Goals" android:textSize="10sp" android:textStyle="bold"
-                android:textColor="@color/muted_text" android:fontFamily="sans-serif-medium" android:layout_marginTop="2dp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Goals"
+                android:textSize="10sp"
+                android:textStyle="bold"
+                android:textColor="@color/muted_text"
+                android:fontFamily="sans-serif-medium"
+                android:layout_marginTop="2dp" />
+
         </LinearLayout>
 
-        <LinearLayout android:id="@+id/navBadges" android:layout_width="0dp" android:layout_height="match_parent"
-            android:layout_weight="1" android:orientation="vertical" android:gravity="center"
-            android:clickable="true" android:focusable="true">
-            <androidx.cardview.widget.CardView android:layout_width="44dp" android:layout_height="44dp"
-                app:cardCornerRadius="14dp" app:cardElevation="0dp" app:cardBackgroundColor="#FFD454">
-                <TextView android:layout_width="match_parent" android:layout_height="match_parent"
-                    android:text="🏆" android:gravity="center" android:textSize="20sp"/>
+        <!-- badges nav item is the active tab, highlighted with honey background
+             wired via navBadges id -->
+        <LinearLayout
+            android:id="@+id/navBadges"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:clickable="true"
+            android:focusable="true">
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                app:cardCornerRadius="14dp"
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="#FFD454">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:text="🏆"
+                    android:gravity="center"
+                    android:textSize="20sp" />
+
             </androidx.cardview.widget.CardView>
-            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                android:text="Badges" android:textSize="10sp" android:textStyle="bold"
-                android:textColor="@color/honey_dark" android:fontFamily="sans-serif-medium" android:layout_marginTop="2dp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Badges"
+                android:textSize="10sp"
+                android:textStyle="bold"
+                android:textColor="@color/honey_dark"
+                android:fontFamily="sans-serif-medium"
+                android:layout_marginTop="2dp" />
+
         </LinearLayout>
 
     </LinearLayout>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+    <!--
+    References:
+
+    Android Developers, 2024. CoordinatorLayout.
+    Available at: https://developer.android.com/reference/androidx/coordinatorlayout/widget/CoordinatorLayout
+    [Accessed 19 April 2026].
+
+    Android Developers, 2024. ScrollView.
+    Available at: https://developer.android.com/reference/android/widget/ScrollView
+    [Accessed 19 April 2026].
+
+    Android Developers, 2024. LinearLayout.
+    Available at: https://developer.android.com/guide/topics/ui/layout/linear
+    [Accessed 19 April 2026].
+
+    Android Developers, 2024. ImageView.
+    Available at: https://developer.android.com/reference/android/widget/ImageView
+    [Accessed 19 April 2026].
+
+    Android Developers, 2024. RelativeLayout.
+    Available at: https://developer.android.com/reference/android/widget/RelativeLayout
+    [Accessed 19 April 2026].
+
+    Android Developers, 2024. CardView.
+    Available at: https://developer.android.com/reference/androidx/cardview/widget/CardView
+    [Accessed 19 April 2026].
+
+    Android Developers, 2024. Room - Accessing data using DAOs.
+    Available at: https://developer.android.com/training/data-storage/room/accessing-data
+    [Accessed 19 April 2026].
+
+    Android Developers, 2024. ProgressBar.
+    Available at: https://developer.android.com/reference/android/widget/ProgressBar
+    [Accessed 19 April 2026].
+
+    Android Developers, 2024. LinearLayout - Weight.
+    Available at: https://developer.android.com/guide/topics/ui/layout/linear#Weight
+    [Accessed 19 April 2026].
+
+    Android Developers, 2024. View - alpha attribute.
+    Available at: https://developer.android.com/reference/android/view/View#attr_android:alpha
+    [Accessed 19 April 2026].
+
+    Android Developers, 2024. View - setOnClickListener.
+    Available at: https://developer.android.com/reference/android/view/View#setOnClickListener(android.view.View.OnClickListener)
+    [Accessed 19 April 2026].
+
+    Android Developers, 2024. FloatingActionButton.
+    Available at: https://developer.android.com/reference/com/google/android/material/floatingactionbutton/FloatingActionButton
+    [Accessed 19 April 2026].
+
+    Android Developers, 2024. Implementing navigation.
+    Available at: https://developer.android.com/training/implementing-navigation/nav-drawer
+    [Accessed 19 April 2026].
+    -->

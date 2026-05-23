@@ -1,37 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-    ╔══════════════════════════════════════════════════════════════╗
-    ║     BUDGET BEE — Login Screen (Mockup-Integrated Final)     ║
-    ║                                                              ║
-    ║  Matches HTML mockup exactly:                                ║
-    ║  • Honey yellow (#FFB800) header with honeycomb overlay      ║
-    ║  • 🐝 emoji + "Welcome Back!" in Fredoka One                 ║
-    ║  • Cream (#FFF9EC) bottom card with rounded top corners      ║
-    ║  • Log In / Sign Up pill tab switcher                        ║
-    ║  • Uppercase field labels (MUTED, small caps style)          ║
-    ║  • Clean outlined input boxes — NO icon overlap              ║
-    ║  • Honey pill button with dark text + shadow                 ║
-    ║  • 🐝 divider between button and register link               ║
-    ║                                                              ║
-    ║  FILES NEEDED:                                               ║
-    ║  res/drawable/tab_row_bg.xml   (see bottom of file)          ║
-    ║  res/drawable/tab_active_bg.xml (see bottom of file)         ║
-    ║  res/drawable/hex_pattern_bg.xml (see bottom of file)        ║
-    ║  res/font/fredoka_one.ttf      (fonts.google.com)            ║
-    ║                                                              ║
-    ║  COLORS needed in res/values/colors.xml:                     ║
-    ║  <color name="honey">#FFB800</color>                         ║
-    ║  <color name="honey_dark">#E09000</color>                    ║
-    ║  <color name="charcoal">#2D2416</color>                      ║
-    ║  <color name="cream">#FFF9EC</color>                         ║
-    ║  <color name="muted_text">#8A7B5A</color>                    ║
-    ║  <color name="input_stroke">#EDE4C8</color>                  ║
-    ║  <color name="black_deep">#1A1208</color>                    ║
-    ║                                                              ║
-    ║  AndroidManifest.xml — add to LoginActivity:                 ║
-    ║  android:windowSoftInputMode="adjustResize"                  ║
-    ╚══════════════════════════════════════════════════════════════╝
--->
+
 
 <ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
@@ -46,11 +14,6 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <!-- ════════════════════════════════════════════════════
-             TOP HEADER — Honey yellow, matches mockup login header
-             Bee emoji + "Welcome Back!" + tagline
-             Honeycomb pattern overlay at low opacity
-        ════════════════════════════════════════════════════ -->
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="300dp"
