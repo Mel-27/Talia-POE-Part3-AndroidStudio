@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- BUDGET BEE — Onboarding Mockup Screen 1 of 5: Welcome -->
+
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -87,7 +87,9 @@
     </LinearLayout>
 
     <!-- Next button -->
+    <!-- Next button — add android:id -->
     <androidx.cardview.widget.CardView
+        android:id="@+id/btnNext"
         android:layout_width="match_parent"
         android:layout_height="54dp"
         android:layout_marginBottom="10dp"
@@ -105,8 +107,9 @@
             android:fontFamily="@font/fredoka_one" />
     </androidx.cardview.widget.CardView>
 
-    <!-- Skip -->
+    <!-- Skip — add android:id -->
     <TextView
+        android:id="@+id/btnSkip"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Skip"
@@ -115,5 +118,4 @@
         android:fontFamily="sans-serif-medium"
         android:padding="8dp"
         android:layout_gravity="center_horizontal" />
-
 </LinearLayout>

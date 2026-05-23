@@ -1,5 +1,6 @@
 package com.gia.poe_demo.data.database
 
+
 import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
@@ -10,11 +11,11 @@ import com.gia.poe_demo.HoneyPoints
 import com.gia.poe_demo.HoneyPointsDao
 import com.gia.poe_demo.data.dao.CategoryDao
 import com.gia.poe_demo.data.dao.ExpenseDao
-import com.gia.poe_demo.data.dao.ReminderDao
+import com.gia.poe_demo.data.dao.ReminderDao   // ← from data.dao
 import com.gia.poe_demo.data.dao.UserDao
 import com.gia.poe_demo.data.entities.Category
 import com.gia.poe_demo.data.entities.Expense
-import com.gia.poe_demo.data.entities.Reminder
+import com.gia.poe_demo.data.entities.Reminder  // ← from data.entities
 import com.gia.poe_demo.data.entities.User
 
 @Database(

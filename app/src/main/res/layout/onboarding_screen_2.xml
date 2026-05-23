@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- BUDGET BEE — Onboarding Mockup Screen 2 of 5: Navigation Guide -->
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -17,10 +16,8 @@
         android:paddingTop="56dp"
         android:paddingBottom="16dp">
 
-        <!-- Top spacer -->
         <View android:layout_width="0dp" android:layout_height="0dp" android:layout_weight="1" />
 
-        <!-- Heading -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -43,14 +40,12 @@
             android:layout_gravity="center_horizontal"
             android:layout_marginBottom="20dp" />
 
-        <!-- Row 1: Home + Expenses -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:layout_marginBottom="10dp">
 
-            <!-- Home -->
             <androidx.cardview.widget.CardView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -78,7 +73,6 @@
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
-            <!-- Expenses -->
             <androidx.cardview.widget.CardView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -108,14 +102,12 @@
 
         </LinearLayout>
 
-        <!-- Row 2: Goals + Badges -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:layout_marginBottom="10dp">
 
-            <!-- Goals -->
             <androidx.cardview.widget.CardView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -143,7 +135,6 @@
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
-            <!-- Badges -->
             <androidx.cardview.widget.CardView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -173,7 +164,6 @@
 
         </LinearLayout>
 
-        <!-- Row 3: Bell + Add Expense — full width callout -->
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -205,11 +195,9 @@
                     </LinearLayout>
                 </LinearLayout>
 
-                <!-- Divider -->
                 <View android:layout_width="1dp" android:layout_height="36dp" android:background="#33FFFFFF"
                     android:layout_marginStart="8dp" android:layout_marginEnd="8dp" />
 
-                <!-- + Button -->
                 <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
                     android:layout_weight="1" android:orientation="horizontal" android:gravity="center_vertical">
                     <androidx.cardview.widget.CardView android:layout_width="42dp" android:layout_height="42dp"
@@ -234,10 +222,9 @@
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
-        <!-- Bottom spacer -->
         <View android:layout_width="0dp" android:layout_height="0dp" android:layout_weight="1" />
 
-        <!-- Dot indicators: screen 2 active -->
+
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -254,6 +241,7 @@
 
         <!-- Next button -->
         <androidx.cardview.widget.CardView
+            android:id="@+id/btnNext"
             android:layout_width="match_parent"
             android:layout_height="54dp"
             android:layout_marginBottom="10dp"
@@ -261,6 +249,7 @@
             app:cardElevation="4dp"
             app:cardBackgroundColor="@color/honey">
             <TextView
+
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:text="Next"
@@ -273,6 +262,7 @@
 
         <!-- Skip -->
         <TextView
+            android:id="@+id/btnSkip"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Skip"
