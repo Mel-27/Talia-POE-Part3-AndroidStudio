@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Basic Colors -->
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+
+    <!-- Primary Colors -->
+    <color name="primary_color">#FF6B35</color>
+    <color name="primary_dark">#E54F1F</color>
+    <color name="primary_light">#FF9F6E</color>
+
+    <!-- Accent Colors -->
+    <color name="accent_color">#4ECDC4</color>
+
+    <!-- Text Colors -->
+    <color name="primary_text">#2C3E50</color>
+    <color name="secondary_text">#7F8C8D</color>
+
+    <!-- Background/UI Colors -->
+    <color name="light_gray">#F5F5F5</color>
+    <color name="divider">#BDC3C7</color>
+    <color name="transparent">#00000000</color>
+
+    <!-- Status Colors -->
+    <color name="error_red">#E74C3C</color>
+    <color name="success_green">#27AE60</color>
+    <color name="warning_yellow">#F39C12</color>
+    <color name="light_background">#F8F9FA</color>
+    <color name="light_yellow">#20FFC107</color>
+    <color name="light_red">#20E74C3C</color>
+    <color name="light_green">#2027AE60</color>
+    <color name="card_background">#FFFFFF</color>
+    <color name="white_alpha_20">#33FFFFFF</color>
+    <color name="white_alpha_30">#4DFFFFFF</color>
+    <color name="honey_yellow">#FFB800</color>
+    <color name="charcoal">#2D2416</color>
+    <color name="cream_white">#FFF9EC</color>               ║
+    ║    <color name="honey_dark">#E09000</color>                   ║
+    ║    <color name="cream">#FFF9EC</color>                       ║
+    ║    <color name="cream2">#FFF3D0</color>                      ║
+    ║    <color name="input_stroke">#EDE4C8</color>                ║
+    ║    <color name="muted_text">#8A7B5A</color>
+    <color name="honey">#FFB800</color>                          ║
+    ║  <color name="black_deep">#1A1208</color>
+
+    <!-- Bottom Navigation Specific Colors -->
+    <color name="bottom_nav_icon_default">#8E8E8E</color>
+    <color name="bottom_nav_icon_selected">#FF6B35</color>
+    <color name="bottom_nav_text_default">#8E8E8E</color>
+    <color name="bottom_nav_text_selected">#FF6B35</color>
+    <color name="bottom_nav_background">#FFFFFF</color>
+</resources>

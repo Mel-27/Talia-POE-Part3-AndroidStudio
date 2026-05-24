@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Background color (used instead of light cream for dark theme) -->
+    <color name="cream">#1A1A1A</color>
+
+    <!-- Card or surface background color -->
+    <color name="white">#2C2C2C</color>
+
+    <!-- Primary text color (white for dark mode readability) -->
+    <color name="black_deep">#FFFFFF</color>
+
+    <!-- Secondary or muted text (less emphasis) -->
+    <color name="muted_text">#AAAAAA</color>
+
+    <!-- Input field border/stroke color -->
+    <color name="input_stroke">#444444</color>
+
+
+</resources>

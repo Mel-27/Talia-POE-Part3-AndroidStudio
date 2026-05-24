@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+
+    <!-- Coffee cup -->
+    <path
+        android:pathData="M5,7L17,7L17,16C17,17.1 16.1,18 15,18L7,18C5.9,18 5,17.1 5,16L5,7Z"
+        android:strokeWidth="1.5"
+        android:strokeColor="#FFC107"
+        android:fillColor="#00000000"/>
+
+</vector>

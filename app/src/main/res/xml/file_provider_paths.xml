@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    FileProvider paths configuration.
+    Allows the camera to write photos to the app's external storage directory.
+    Reference: Android FileProvider documentation; IIE PROG7313 Module Manual (2026)
+-->
+<paths xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Access to getExternalFilesDir() -->
+    <external-files-path
+        name="external_files"
+        path="." />
+
+    <external-files-path
+        name="my_images"
+        path="Pictures/" />
+
+    <!-- Access to getCacheDir() -->
+    <cache-path
+        name="cache"
+        path="." />
+
+    <!-- Access to getExternalCacheDir() -->
+    <external-cache-path
+        name="external_cache"
+        path="." />
+
+</paths>

@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- BUDGET BEE — Onboarding Mockup Screen 4 of 5: Earn Badges & Rewards -->
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center_horizontal"
+    android:background="@color/cream"
+    android:paddingStart="32dp"
+    android:paddingEnd="32dp"
+    android:paddingTop="56dp"
+    android:paddingBottom="28dp">
+
+    <View android:layout_width="0dp" android:layout_height="0dp" android:layout_weight="1" />
+
+    <!-- Title -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Earn Badges &amp; Rewards"
+        android:textColor="@color/black_deep"
+        android:textSize="28sp"
+        android:fontFamily="@font/fredoka_one"
+        android:gravity="center"
+        android:layout_marginBottom="14dp" />
+
+    <!-- Subtitle -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Stay on track and get rewarded. Earn Honey Points for every good money habit."
+        android:textColor="@color/muted_text"
+        android:textSize="14sp"
+        android:fontFamily="sans-serif-medium"
+        android:gravity="center"
+        android:lineSpacingMultiplier="1.45"
+        android:layout_marginBottom="22dp" />
+
+    <!-- Honey points card -->
+    <androidx.cardview.widget.CardView android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:layout_marginBottom="14dp" app:cardCornerRadius="18dp" app:cardElevation="0dp" app:cardBackgroundColor="@color/honey">
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="vertical" android:padding="16dp" android:gravity="center_horizontal">
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:text="HONEY POINTS" android:textColor="#99291A00"
+                android:textSize="10sp" android:textStyle="bold" android:fontFamily="sans-serif-medium"
+                android:letterSpacing="0.1" android:layout_marginBottom="4dp" />
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:text="200 pts" android:textColor="@color/black_deep"
+                android:textSize="34sp" android:fontFamily="@font/fredoka_one" />
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+
+    <!-- 2 badge previews side by side -->
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:orientation="horizontal" android:layout_marginBottom="24dp">
+
+        <androidx.cardview.widget.CardView android:layout_width="0dp" android:layout_height="wrap_content"
+            android:layout_weight="1" android:layout_marginEnd="8dp"
+            app:cardCornerRadius="16dp" app:cardElevation="2dp" app:cardBackgroundColor="@color/white">
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:orientation="vertical" android:gravity="center" android:padding="12dp">
+                <ImageView
+                    android:id="@+id/imgBadgeWorkerBee"
+                    android:layout_width="56dp"
+                    android:layout_height="56dp"
+                    android:src="@drawable/worker_bee"
+                    android:scaleType="fitCenter"
+                    android:contentDescription="Worker Bee badge" />
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="Worker Bee" android:textColor="@color/black_deep"
+                    android:textSize="11sp" android:textStyle="bold" android:fontFamily="sans-serif-medium"
+                    android:gravity="center" android:layout_marginTop="4dp" />
+                <androidx.cardview.widget.CardView android:layout_width="wrap_content" android:layout_height="22dp"
+                    android:layout_marginTop="6dp" app:cardCornerRadius="50dp" app:cardElevation="0dp"
+                    app:cardBackgroundColor="@color/honey">
+                    <TextView android:layout_width="wrap_content" android:layout_height="match_parent"
+                        android:text="&#10003; Earned" android:gravity="center"
+                        android:textColor="@color/black_deep" android:textSize="10sp"
+                        android:textStyle="bold" android:fontFamily="sans-serif-medium"
+                        android:paddingStart="8dp" android:paddingEnd="8dp" />
+                </androidx.cardview.widget.CardView>
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView android:layout_width="0dp" android:layout_height="wrap_content"
+            android:layout_weight="1"
+            app:cardCornerRadius="16dp" app:cardElevation="2dp" app:cardBackgroundColor="@color/white">
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:orientation="vertical" android:gravity="center" android:padding="12dp"
+                android:alpha="0.4">
+                <ImageView
+                    android:id="@+id/imgBadgeHoneyCollector"
+                    android:layout_width="56dp"
+                    android:layout_height="56dp"
+                    android:src="@drawable/honey_collector"
+                    android:scaleType="fitCenter"
+                    android:contentDescription="Honey Collector badge" />
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="Honey Collector" android:textColor="@color/black_deep"
+                    android:textSize="11sp" android:textStyle="bold" android:fontFamily="sans-serif-medium"
+                    android:gravity="center" android:layout_marginTop="4dp" />
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="&#128274; 250 pts" android:textColor="@color/muted_text"
+                    android:textSize="10sp" android:fontFamily="sans-serif-medium"
+                    android:layout_marginTop="6dp" />
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+    </LinearLayout>
+
+    <View android:layout_width="0dp" android:layout_height="0dp" android:layout_weight="1" />
+
+    <!-- Dot indicators: screen 4 active -->
+    <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:orientation="horizontal" android:gravity="center" android:layout_marginBottom="18dp">
+        <View android:layout_width="8dp" android:layout_height="8dp" android:layout_marginEnd="6dp" android:background="#DDDDDD" />
+        <View android:layout_width="8dp" android:layout_height="8dp" android:layout_marginEnd="6dp" android:background="#DDDDDD" />
+        <View android:layout_width="8dp" android:layout_height="8dp" android:layout_marginEnd="6dp" android:background="#DDDDDD" />
+        <View android:layout_width="28dp" android:layout_height="8dp" android:layout_marginEnd="6dp" android:background="@color/honey_dark" />
+        <View android:layout_width="8dp" android:layout_height="8dp" android:background="#DDDDDD" />
+    </LinearLayout>
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/btnNext"
+        android:layout_width="match_parent" android:layout_height="54dp"
+        android:layout_marginBottom="10dp" app:cardCornerRadius="18dp" app:cardElevation="4dp" app:cardBackgroundColor="@color/honey">
+        <TextView android:layout_width="match_parent" android:layout_height="match_parent"
+            android:text="Next" android:gravity="center" android:textColor="@color/black_deep"
+            android:textSize="16sp" android:textStyle="bold" android:fontFamily="@font/fredoka_one" />
+    </androidx.cardview.widget.CardView>
+
+    <TextView
+        android:id="@+id/btnSkip" android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:text="Skip" android:textColor="@color/muted_text" android:textSize="13sp"
+        android:fontFamily="sans-serif-medium" android:padding="8dp" android:layout_gravity="center_horizontal" />
+
+</LinearLayout>

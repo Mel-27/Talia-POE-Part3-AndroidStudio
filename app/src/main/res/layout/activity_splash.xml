@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- activity_splash_logo.xml
+     Pure splash screen — logo centred on a honeycomb pattern background.
+     Show for ~2 seconds then navigate to onboarding or login.
+
+     Kotlin (SplashActivity.kt):
+     ─────────────────────────────
+     override fun onCreate(savedInstanceState: Bundle?) {
+         super.onCreate(savedInstanceState)
+         setContentView(R.layout.activity_splash_logo)
+
+         // Fade-in animation
+         val logo = findViewById<ImageView>(R.id.ivSplashLogo)
+         val name = findViewById<TextView>(R.id.tvSplashName)
+         logo.alpha = 0f
+         name.alpha = 0f
+         logo.animate().alpha(1f).setDuration(800).start()
+         name.animate().alpha(1f).setStartDelay(400).setDuration(600).start()
+
+         // Navigate after 2.2s
+         Handler(Looper.getMainLooper()).postDelayed({
+             val prefs = getSharedPreferences("bb_prefs", MODE_PRIVATE)
+             val seen  = prefs.getBoolean("onboarding_done", false)
+             val dest  = if (seen) LoginActivity::class.java else OnboardingActivity::class.java
+             startActivity(Intent(this, dest))
+             finish()
+         }, 2200)
+     }
+-->
+
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:background="@color/cream">
+
+    <!-- Logo -->
+    <ImageView
+        android:id="@+id/ivSplashLogo"
+        android:layout_width="170dp"
+        android:layout_height="170dp"
+        android:src="@drawable/budgetbee"
+        android:scaleType="fitCenter"
+        android:contentDescription="Budget Bee Logo" />
+
+
+
+    <!-- Loading dots -->
+    <TextView
+        android:id="@+id/tvLoadingDots"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="..."
+        android:textColor="@color/honey"
+        android:textSize="28sp"
+        android:fontFamily="@font/fredoka_one"
+        android:layout_marginTop="48dp"
+        android:letterSpacing="0.3" />
+
+</LinearLayout>

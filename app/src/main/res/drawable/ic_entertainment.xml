@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+
+    <!-- Movie clapperboard base -->
+    <path
+        android:pathData="M4,8L20,8L20,18L4,18L4,8Z"
+        android:strokeWidth="1.5"
+        android:strokeColor="#27AE60"
+        android:fillColor="#00000000"/>
+
+    <!-- Top part of clapperboard -->
+    <path
+        android:pathData="M8,8L8,5L16,5L16,8"
+        android:strokeWidth="1.5"
+        android:strokeColor="#27AE60"
+        android:fillColor="#00000000"/>
+
+    <!-- Diagonal lines (clapperboard stripes) -->
+    <path
+        android:pathData="M6,10L10,14"
+        android:strokeWidth="1.5"
+        android:strokeColor="#27AE60"
+        android:strokeLineCap="round"/>
+    <path
+        android:pathData="M10,10L14,14"
+        android:strokeWidth="1.5"
+        android:strokeColor="#27AE60"
+        android:strokeLineCap="round"/>
+    <path
+        android:pathData="M14,10L18,14"
+        android:strokeWidth="1.5"
+        android:strokeColor="#27AE60"
+        android:strokeLineCap="round"/>
+
+    <!-- Film strip holes -->
+    <circle cx="7" cy="11" r="0.8" android:fillColor="#27AE60"/>
+    <circle cx="7" cy="13" r="0.8" android:fillColor="#27AE60"/>
+    <circle cx="7" cy="15" r="0.8" android:fillColor="#27AE60"/>
+    <circle cx="17" cy="11" r="0.8" android:fillColor="#27AE60"/>
+    <circle cx="17" cy="13" r="0.8" android:fillColor="#27AE60"/>
+    <circle cx="17" cy="15" r="0.8" android:fillColor="#27AE60"/>
+</vector>

@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center_horizontal"
+    android:background="@color/cream"
+    android:paddingStart="36dp"
+    android:paddingEnd="36dp"
+    android:paddingTop="48dp"
+    android:paddingBottom="28dp">
+
+    <!-- Top spacer — pushes circle down to visual centre -->
+    <View
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+    <!-- Logo centrepiece — no background circle -->
+    <ImageView
+        android:layout_width="220dp"
+        android:layout_height="220dp"
+        android:layout_marginBottom="36dp"
+        android:src="@drawable/budgetbee"
+        android:scaleType="fitCenter"
+        android:contentDescription="Budget Bee Logo" />
+
+    <!-- Title -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Welcome to Budget Bee"
+        android:textColor="@color/black_deep"
+        android:textSize="28sp"
+        android:fontFamily="@font/fredoka_one"
+        android:gravity="center"
+        android:layout_marginBottom="12dp" />
+
+    <!-- Subtitle — clean, professional -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Take control of your money."
+        android:textColor="@color/black_deep"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:fontFamily="sans-serif-medium"
+        android:gravity="center"
+        android:layout_marginBottom="10dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Track expenses, set budgets, and build better habits — all in one place."
+        android:textColor="@color/muted_text"
+        android:textSize="13sp"
+        android:fontFamily="sans-serif-medium"
+        android:gravity="center"
+        android:lineSpacingMultiplier="1.5" />
+
+    <!-- Bottom spacer — flexes to push dots + buttons to bottom -->
+    <View
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+    <!-- Dot indicators: screen 1 active -->
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_marginBottom="20dp">
+        <View android:layout_width="28dp" android:layout_height="8dp" android:layout_marginEnd="6dp"
+            android:background="@color/honey_dark" />
+        <View android:layout_width="8dp" android:layout_height="8dp" android:layout_marginEnd="6dp"
+            android:background="#DDDDDD" />
+        <View android:layout_width="8dp" android:layout_height="8dp" android:layout_marginEnd="6dp"
+            android:background="#DDDDDD" />
+        <View android:layout_width="8dp" android:layout_height="8dp" android:layout_marginEnd="6dp"
+            android:background="#DDDDDD" />
+        <View android:layout_width="8dp" android:layout_height="8dp"
+            android:background="#DDDDDD" />
+    </LinearLayout>
+
+    <!-- Next button -->
+    <!-- Next button — add android:id -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/btnNext"
+        android:layout_width="match_parent"
+        android:layout_height="54dp"
+        android:layout_marginBottom="10dp"
+        app:cardCornerRadius="18dp"
+        app:cardElevation="4dp"
+        app:cardBackgroundColor="@color/honey">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="Next"
+            android:gravity="center"
+            android:textColor="@color/black_deep"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:fontFamily="@font/fredoka_one" />
+    </androidx.cardview.widget.CardView>
+
+    <!-- Skip — add android:id -->
+    <TextView
+        android:id="@+id/btnSkip"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Skip"
+        android:textColor="@color/muted_text"
+        android:textSize="13sp"
+        android:fontFamily="sans-serif-medium"
+        android:padding="8dp"
+        android:layout_gravity="center_horizontal" />
+</LinearLayout>
