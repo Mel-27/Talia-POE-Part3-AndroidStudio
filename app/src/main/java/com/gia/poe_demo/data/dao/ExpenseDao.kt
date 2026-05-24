@@ -65,6 +65,7 @@ interface ExpenseDao {
     suspend fun updateReceiptUrl(id: Long, url: String)
 }
 
+
 /*
 References:
 
