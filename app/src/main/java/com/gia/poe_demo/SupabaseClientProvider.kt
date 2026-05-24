@@ -20,3 +20,13 @@ object SupabaseClientProvider {
     }
 }
 
+/*
+References:
+Supabase, 2026. Kotlin Quickstart.
+Available at: https://supabase.com/docs/guides/getting-started/quickstarts/kotlin
+[Accessed 24 May 2026].
+
+supabase-community, 2026. supabase-kt GitHub Repository.
+Available at: https://github.com/supabase-community/supabase-kt
+[Accessed 24 May 2026].
+*/
