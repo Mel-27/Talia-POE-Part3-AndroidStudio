@@ -59,6 +59,8 @@ interface ExpenseDao {
         end: Long
     ): kotlinx.coroutines.flow.Flow<List<CategoryTotal>>
 
+    // Updates the receipt photo path with the Supabase URL after a successful upload
+    // (Android Developers, 2019)
     @Query("UPDATE expenses SET receiptPhotoPath = :url WHERE id = :id")
     suspend fun updateReceiptUrl(id: Long, url: String)
 }
@@ -85,4 +87,9 @@ Available at: https://developer.android.com/reference/androidx/room/Query
 Android Developers, 2024. Kotlin coroutines on Android.
 Available at: https://developer.android.com/kotlin/coroutines
 [Accessed 22 April 2026].
+
+Android Developers. (2019). Accessing data using Room DAOs  |  Android Developers. [online]
+Available at: https://developer.android.com/training/data-storage/room/accessing-data.
+[Accessed 24 May 2026].
+
 */
