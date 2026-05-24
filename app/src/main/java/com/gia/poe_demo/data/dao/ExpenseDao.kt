@@ -13,7 +13,7 @@ import com.gia.poe_demo.data.entities.CategoryTotal
 interface ExpenseDao {
 
     @Insert
-    suspend fun insert(expense: Expense)
+    suspend fun insert(expense: Expense) : Long
 
     @Insert
     suspend fun insertExpense(expense: Expense): Long
@@ -58,6 +58,9 @@ interface ExpenseDao {
         start: Long,
         end: Long
     ): kotlinx.coroutines.flow.Flow<List<CategoryTotal>>
+
+    @Query("UPDATE expenses SET receiptPhotoPath = :url WHERE id = :id")
+    suspend fun updateReceiptUrl(id: Long, url: String)
 }
 
 /*
