@@ -381,14 +381,16 @@ class ExpensesListActivity : AppCompatActivity() {
     }
 
     private fun openReceipt(path: String) {
-
+        // If the path is a Supabase URL, open it directly in the browser
+        // Uses Intent.ACTION_VIEW with Uri.parse() to open URLs (Android Developers, 2026)
         if (path.startsWith("http")) {
             val intent = Intent(Intent.ACTION_VIEW, Uri.parse(path))
             android.util.Log.d("ExpensesList", "Opening Supabase receipt URL: $path")
             startActivity(intent)
             return
         }
-
+        //Checks if the local receipt file still exists before attempting to open it
+       // (Android Developers, 2026)
         val file = File(path)
         if (!file.exists()) {
             Toast.makeText(this, "Receipt photo no longer found", Toast.LENGTH_SHORT).show()
@@ -396,6 +398,7 @@ class ExpensesListActivity : AppCompatActivity() {
             return
         }
 
+        // Uses FLAG_GRANT_READ_URI_PERMISSION to grant temporary read access (Android Developers, 2026)
         val uri: Uri = FileProvider.getUriForFile(this, "${packageName}.fileprovider", file)
         val intent = Intent(Intent.ACTION_VIEW).apply {
             setDataAndType(uri, "image/*")
@@ -486,36 +489,51 @@ class ExpensesListActivity : AppCompatActivity() {
 * when the screen starts and returns to focus:
 * Android Developers. (2019). Understand the Activity Lifecycle  |  Android Developers. Available at:
 * https://developer.android.com/guide/components/activities/activity-lifecycle.
-* [Accessed 27 Apr. 2026]
+* [Accessed 27 Apr. 2026].
 *
 * Used for Intent navigation when opening ReceiptViewActivity and passing data (photoPath)
 * between screens:
 * Android Developers. (2019). Intents and Intent Filters  |  Android Developers. Available at:
 * https://developer.android.com/guide/components/intents-filters.
-* [Accessed 27 Apr. 2026]
+* [Accessed 27 Apr. 2026].
 *
 * Used for loading Room database data asynchronously using coroutines (lifecycleScope):
 * David (2021). Using coroutines with Android Room database. Stack Overflow. Available at:
 * https://stackoverflow.com/questions/68126665/using-coroutines-with-android-room-database.
-* [Accessed 27 Apr. 2026]
+* [Accessed 27 Apr. 2026].
 *
 * Used for loading data from Room database when the expense list changes:
 * Guendouz, M. (2018). Room, LiveData, and RecyclerView. Medium. Available at:
 * https://medium.com/@guendouz/room-livedata-and-recyclerview-d8e96fb31dfe
-* [Accessed 26 Apr. 2026]
+* [Accessed 26 Apr. 2026].
 *
 * Used for implementing data filtering logic:
 * Meyta Taliti (2022). Simple List with Date Range Filter - Meyta Taliti - Medium. Medium. Available at:
 * https://medium.com/@meytataliti/simple-list-with-date-range-filter-19bd71761495.
-* [Accessed 27 Apr. 2026]
+* [Accessed 27 Apr. 2026].
 *
 * user1061793 (2012). How to add days into the date in android. Stack Overflow. Available at:
 * https://stackoverflow.com/questions/8738369/how-to-add-days-into-the-date-in-android.
-* [Accessed 27 Apr. 2026]
+* [Accessed 27 Apr. 2026].
 *
 * Used for implementing the Material date picker for custom date range selection:
 * Android Developers. (2024). Pick a date or time | Android Developers. Available at:
 * https://developer.android.com/develop/ui/views/components/pickers.
-* [Accessed 27 Apr. 2026]
-*/
+* [Accessed 27 Apr. 2026].
+*
+* Used for opening URLs and local files in openReceipt:
+* Android Developers. (2026). Fulfill common use cases while having limited package visibility. [online]
+* Available at:
+* https://developer.android.com/training/package-visibility/use-cases.
+* [Accessed 24 May 2026].
+*
+* Used for checking if a local receipt file exists before opening it in openReceipt():
+* Android Developers. (2026). File  |  API reference  |  Android Developers. [online] Available at:
+* https://developer.android.com/reference/java/io/File#exists()
+* [Accessed 24 May 2026].
  */
+ */
+
+
+
+
