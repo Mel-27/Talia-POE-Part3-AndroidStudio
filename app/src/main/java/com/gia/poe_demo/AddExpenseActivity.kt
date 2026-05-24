@@ -401,7 +401,30 @@ class AddExpenseActivity : AppCompatActivity() {
 
         lifecycleScope.launch {
             try {
-                db.expenseDao().insert(expense)
+                val newExpenseId = db.expenseDao().insert(expense)
+
+                // Upload receipt to Supabase if a photo was attached
+                val photoPath = currentPhotoPath
+                if (photoPath != null) {
+                    val prefs = getSharedPreferences("BudgetBeePrefs", MODE_PRIVATE)
+                    val userId = prefs.getInt("USER_ID", -1)
+
+                    Log.d("AddExpense", "Uploading receipt to Supabase for userId=$userId")
+                    Toast.makeText(this@AddExpenseActivity, "Uploading receipt...", Toast.LENGTH_SHORT).show()
+
+                    val supabaseUrl = SupabaseStorageService.uploadReceiptImage(
+                        file = File(photoPath),
+                        userId = userId
+                    )
+
+                    if (supabaseUrl != null) {
+                        db.expenseDao().updateReceiptUrl(newExpenseId, supabaseUrl)
+                        Log.d("AddExpense", "Receipt URL saved to DB: $supabaseUrl")
+                        Toast.makeText(this@AddExpenseActivity, "Receipt uploaded ☁️", Toast.LENGTH_SHORT).show()
+                    } else {
+                        Log.w("AddExpense", "Supabase upload failed — keeping local path")
+                    }
+                }
 
                 // Award +5 Honey Points for adding an expense
                 // Reference: GamificationManager.POINTS_ADD_EXPENSE
@@ -448,6 +471,18 @@ Available at: https://developer.android.com/topic/libraries/architecture/corouti
 Android Ideas (Medium), 2018. findViewById in Kotlin.
 Available at: https://medium.com/android-ideas/findviewbyid-in-kotlin-ce4d22193c79
 [Accessed 27 April 2026].
+
+// Supabase, 2026. Storage Documentation.
+// Available at: https://supabase.com/docs/guides/storage
+// [Accessed 24 May 2026].
+
+// supabase-community, 2026. supabase-kt GitHub Repository.
+// Available at: https://github.com/supabase-community/supabase-kt
+// [Accessed 24 May 2026].
+
+// Supabase, 2026. storage-from-upload (Kotlin reference).
+// Available at: https://supabase.com/docs/reference/kotlin/storage-from-upload
+// [Accessed 24 May 2026].
 
  */
 
