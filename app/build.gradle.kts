@@ -1,14 +1,20 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
-    id("kotlin-kapt")
+    id("com.google.devtools.ksp")
     id("com.google.gms.google-services")
-    kotlin("plugin.serialization") version "2.0.21"
+    kotlin("plugin.serialization") version "2.1.0"
 }
 
 android {
     namespace = "com.gia.poe_demo"
     compileSdk = 35
+
+    configurations.all {
+        resolutionStrategy {
+            force("androidx.browser:browser:1.8.0")
+        }
+    }
 
     defaultConfig {
         applicationId = "com.gia.poe_demo"
@@ -34,16 +40,18 @@ android {
         targetCompatibility = JavaVersion.VERSION_11
     }
 
-    kotlinOptions {
-        jvmTarget = "11"
-    }
-
     buildFeatures {
         viewBinding = true
     }
-}
+ }
+   kotlin {
+      compilerOptions {
+        jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_11)
+    }
+ }
 
 dependencies {
+    implementation("androidx.browser:browser:1.8.0")
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
@@ -55,7 +63,7 @@ dependencies {
     // Room
     implementation(libs.room.runtime)
     implementation(libs.room.ktx)
-    kapt(libs.room.compiler)
+    ksp(libs.room.compiler)
 
     // Lifecycle
     implementation(libs.lifecycle.viewmodel.ktx)
@@ -72,10 +80,10 @@ dependencies {
     implementation("com.google.firebase:firebase-analytics")
 
     // Supabase
-    implementation(platform("io.github.jan-tennert.supabase:bom:3.6.0"))
+    implementation(platform("io.github.jan-tennert.supabase:bom:3.1.4"))
     implementation("io.github.jan-tennert.supabase:storage-kt")
     implementation("io.github.jan-tennert.supabase:postgrest-kt")
-    implementation("io.ktor:ktor-client-android:3.4.3")
+    implementation("io.ktor:ktor-client-android:3.1.3")
 
 
     // Coil for loading images from URLs

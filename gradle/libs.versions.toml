@@ -1,6 +1,7 @@
 [versions]
 agp = "8.8.2"
-kotlin = "2.2.0"
+kotlin = "2.1.0"
+ksp = "2.1.0-1.0.29"
 coreKtx = "1.15.0"
 junit = "4.13.2"
 junitVersion = "1.2.1"
@@ -34,3 +35,4 @@ lifecycle-livedata-ktx = { group = "androidx.lifecycle", name = "lifecycle-lived
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+kotlin-ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
