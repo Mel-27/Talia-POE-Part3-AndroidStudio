@@ -381,18 +381,27 @@ class ExpensesListActivity : AppCompatActivity() {
     }
 
     private fun openReceipt(path: String) {
+
+        if (path.startsWith("http")) {
+            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(path))
+            android.util.Log.d("ExpensesList", "Opening Supabase receipt URL: $path")
+            startActivity(intent)
+            return
+        }
+
         val file = File(path)
         if (!file.exists()) {
             Toast.makeText(this, "Receipt photo no longer found", Toast.LENGTH_SHORT).show()
             android.util.Log.w("ExpensesList", "Receipt missing: $path")
             return
         }
+
         val uri: Uri = FileProvider.getUriForFile(this, "${packageName}.fileprovider", file)
         val intent = Intent(Intent.ACTION_VIEW).apply {
             setDataAndType(uri, "image/*")
             addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         }
-        android.util.Log.d("ExpensesList", "Opening receipt: $path")
+        android.util.Log.d("ExpensesList", "Opening local receipt: $path")
         startActivity(Intent.createChooser(intent, "View Receipt"))
     }
 
