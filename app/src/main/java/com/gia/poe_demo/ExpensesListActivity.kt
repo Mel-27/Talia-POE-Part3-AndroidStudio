@@ -29,15 +29,13 @@ import java.util.*
  * ExpensesListActivity — shows expense entries for a user-selectable period.
  *
  * Features implemented:
- *  - "View list of entries in a period" — date filter chips (This Month / Last 7 Days / 3 Months / custom)
- *  - "View category totals in a period" — summary bar (total, items, avg/day)
- *  - Expense cards dynamically built from RoomDB data
+ *  - "View list of entries in a period" - date filter chips (This Month / Last 7 Days / 3 Months / custom)
+ *  - "View category totals in a period" - summary bar (total, items, avg/day)
  *  - Sort toggle: Newest First / Oldest First
- *  - RECEIPT link on cards — taps open the stored photo in a system image viewer
+ *  - RECEIPT link on cards
  *  - "+ ADD EXPENSE CATEGORY" button navigates to AddCategoryActivity
  *  - Light/dark theme applied from SessionManager
  *
- * Reference: IIE PROG7313 Module Manual (2026)
  */
 
 class ExpensesListActivity : AppCompatActivity() {
@@ -54,7 +52,7 @@ class ExpensesListActivity : AppCompatActivity() {
     private var sortDesc = true    // newest first
 
     private var expenses = listOf<Expense>()
-    private var categoryMap = mapOf<Long, String>()   // id → "emoji name"
+    private var categoryMap = mapOf<Long, String>()   // id -> "emoji name"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -96,6 +94,8 @@ class ExpensesListActivity : AppCompatActivity() {
 
     // Category map
     private fun loadCategoryMap() {
+        // Loads categories from RoomDB and maps IDs to display names
+        // (StackOverflow, 2021)
         lifecycleScope.launch {
             val cats = db.categoryDao().getAll()
             categoryMap = cats.associate { it.id to "${it.iconEmoji} ${it.name}" }
@@ -106,6 +106,8 @@ class ExpensesListActivity : AppCompatActivity() {
 
     // Filter chips
     private fun setupFilterChips() {
+        // Filter chips update the date range and reload expenses for the selected period
+        // (Medium, 2022; StackOverflow, 2012)
         binding.chipThisMonth.setOnClickListener {
             filterStart = startOfMonth()
             filterEnd = System.currentTimeMillis()
@@ -148,6 +150,8 @@ class ExpensesListActivity : AppCompatActivity() {
 
     private fun pickDate(isStart: Boolean) {
         val cal = Calendar.getInstance()
+        // DatePickerDialog allows user to select custom start and end dates
+        // (Android Developers, 2024)
         DatePickerDialog(this, { _, y, m, d ->
             cal.set(y, m, d)
             if (isStart) {
@@ -163,7 +167,7 @@ class ExpensesListActivity : AppCompatActivity() {
                 filterEnd = cal.timeInMillis
                 binding.btnEndDate.text = dateFmt.format(cal.time)
             }
-            // Validates that start date is not after end date
+            // Validates that start date is not after end date (Android Developers, 2026)
             if (filterStart > filterEnd) {
                 Toast.makeText(this, "Start date cannot be after end date", Toast.LENGTH_SHORT).show()
                 filterStart = startOfMonth()
@@ -203,13 +207,15 @@ class ExpensesListActivity : AppCompatActivity() {
 
 
     private fun observeExpenses() {
+        // Observes expense data from RoomDB using coroutines and Flow
+       // (StackOverflow, 2021)
         lifecycleScope.launch {
             db.expenseDao().getByPeriod(filterStart, filterEnd)
                 .collectLatest { list ->
                     expenses = list
                     renderExpenses()
                     updateSummary(expenses)
-                    loadCategoryTotals() // you forgot this call before
+                    loadCategoryTotals()
                 }
         }
     }
@@ -355,7 +361,7 @@ class ExpensesListActivity : AppCompatActivity() {
             })
         }
 
-        // RECEIPT tap target — only shown when a photo was stored
+        // RECEIPT tap target - only shown when a photo was stored
         if (exp.receiptPhotoPath != null && exp.receiptPhotoPath.isNotEmpty()) {
             info.addView(TextView(context).apply {
                 text = "📎 RECEIPT"
@@ -373,7 +379,7 @@ class ExpensesListActivity : AppCompatActivity() {
         }
         row.addView(info)
 
-        // Amount (right aligned)
+        // Amount
         row.addView(TextView(context).apply {
             text = "-R${"%.0f".format(exp.amount)}"
             textSize = 15f
@@ -440,6 +446,8 @@ class ExpensesListActivity : AppCompatActivity() {
 
     // Bottom nav
     private fun setupBottomNav() {
+        // Intent navigation between activities
+       // (Android Developers, 2019)
         binding.navHome.setOnClickListener {
             startActivity(Intent(this, MainActivity::class.java))
             finish()
@@ -540,8 +548,13 @@ class ExpensesListActivity : AppCompatActivity() {
 * Android Developers. (2026). File  |  API reference  |  Android Developers. [online] Available at:
 * https://developer.android.com/reference/java/io/File#exists()
 * [Accessed 24 May 2026].
+*
+* Android Developers. (2026). DatePickerDialog. [online] Available at:
+* https://developer.android.com/reference/android/app/DatePickerDialog.
+* [Accessed 25 May 2026].
  */
  */
+
 
 
 
