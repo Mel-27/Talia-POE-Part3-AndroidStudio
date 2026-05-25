@@ -74,6 +74,9 @@ class ExpensesListActivity : AppCompatActivity() {
             binding.cardExpense3, binding.cardExpense4
         ).forEach { it.visibility = View.GONE }
 
+        // Set default highlighted chip on screen load
+        highlightChip(binding.chipThisMonth)
+
         observeExpenses()
 
         // Handle new expense from AddExpenseActivity
@@ -109,6 +112,7 @@ class ExpensesListActivity : AppCompatActivity() {
         // Filter chips update the date range and reload expenses for the selected period
         // (Medium, 2022; StackOverflow, 2012)
         binding.chipThisMonth.setOnClickListener {
+            highlightChip(binding.chipThisMonth)
             filterStart = startOfMonth()
             filterEnd = System.currentTimeMillis()
             binding.dateRangeRow.visibility = View.GONE
@@ -116,6 +120,7 @@ class ExpensesListActivity : AppCompatActivity() {
             observeExpenses()
         }
         binding.chipLast7.setOnClickListener {
+            highlightChip(binding.chipLast7)
             filterEnd = System.currentTimeMillis()
             filterStart = filterEnd - 7L * 86_400_000
             binding.dateRangeRow.visibility = View.GONE
@@ -123,6 +128,7 @@ class ExpensesListActivity : AppCompatActivity() {
             observeExpenses()
         }
         binding.chip3Months.setOnClickListener {
+            highlightChip(binding.chip3Months)
             filterEnd = System.currentTimeMillis()
             val cal = Calendar.getInstance()
             cal.add(Calendar.MONTH, -3)
@@ -132,6 +138,7 @@ class ExpensesListActivity : AppCompatActivity() {
             observeExpenses()
         }
         binding.chipCustomRange.setOnClickListener {
+            highlightChip(binding.chipCustomRange)
             binding.dateRangeRow.visibility =
                 if (binding.dateRangeRow.visibility == View.VISIBLE) View.GONE else View.VISIBLE
         }
@@ -441,6 +448,21 @@ class ExpensesListActivity : AppCompatActivity() {
     private fun setupAddCategoryButton() {
         binding.btnAddCategory.setOnClickListener {
             startActivity(Intent(this, AddCategoryActivity::class.java))
+        }
+    }
+
+    // Highlights the selected filter chip and resets the others
+    private fun highlightChip(selected: View) {
+        listOf(
+            binding.chipThisMonth,
+            binding.chipLast7,
+            binding.chip3Months,
+            binding.chipCustomRange
+        ).forEach { chip ->
+            chip.setBackgroundResource(
+                if (chip == selected) R.drawable.chip_selected_bg
+                else R.drawable.chip_unselected_bg
+            )
         }
     }
 
