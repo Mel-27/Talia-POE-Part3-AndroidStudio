@@ -451,7 +451,7 @@ class ExpensesListActivity : AppCompatActivity() {
         }
     }
 
-    // Highlights the selected filter chip and resets the others
+    // Highlights the selected filter chip and resets the others (Android Developers, 2026)
     private fun highlightChip(selected: View) {
         listOf(
             binding.chipThisMonth,
@@ -571,8 +571,14 @@ class ExpensesListActivity : AppCompatActivity() {
 * https://developer.android.com/reference/java/io/File#exists()
 * [Accessed 24 May 2026].
 *
+* Used for validating that the start date is not after the end date in pickDate:
 * Android Developers. (2026). DatePickerDialog. [online] Available at:
 * https://developer.android.com/reference/android/app/DatePickerDialog.
+* [Accessed 25 May 2026].
+*
+* Used for highlighting the selected filter chip by changing its background drawable in highlightChip():
+* Android Developers. (2026). View  |  API reference  |  Android Developers. [online] Available at:
+* https://developer.android.com/reference/android/view/View#setBackgroundResource
 * [Accessed 25 May 2026].
  */
  */
