@@ -163,6 +163,15 @@ class ExpensesListActivity : AppCompatActivity() {
                 filterEnd = cal.timeInMillis
                 binding.btnEndDate.text = dateFmt.format(cal.time)
             }
+            // Validates that start date is not after end date
+            if (filterStart > filterEnd) {
+                Toast.makeText(this, "Start date cannot be after end date", Toast.LENGTH_SHORT).show()
+                filterStart = startOfMonth()
+                filterEnd = System.currentTimeMillis()
+                binding.btnStartDate.text = "Start Date"
+                binding.btnEndDate.text = "End Date"
+                return@DatePickerDialog
+            }
             updateFilterDisplay()
             observeExpenses()
         }, cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH)).show()
