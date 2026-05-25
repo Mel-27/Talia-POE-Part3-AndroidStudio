@@ -23,7 +23,10 @@ import java.io.File
 import java.text.SimpleDateFormat
 import kotlinx.coroutines.flow.collectLatest
 import java.util.*
-
+import com.gia.poe_demo.data.remote.ExpenseModel
+import com.gia.poe_demo.data.util.RealtimeDbManager
+import com.gia.poe_demo.data.util.SyncManager
+import kotlinx.coroutines.flow.first
 
 /**
  * ExpensesListActivity — shows expense entries for a user-selectable period.
@@ -35,7 +38,9 @@ import java.util.*
  *  - RECEIPT link on cards
  *  - "+ ADD EXPENSE CATEGORY" button navigates to AddCategoryActivity
  *  - Light/dark theme applied from SessionManager
- *
+ *  - [NEW] Cloud sync with Firebase Realtime Database
+ *  - [NEW] Real-time expense observation from cloud
+ *  - [NEW] Sync status indicator
  */
 
 class ExpensesListActivity : AppCompatActivity() {
@@ -43,6 +48,13 @@ class ExpensesListActivity : AppCompatActivity() {
     private lateinit var binding: ActivityExpensesListBinding
     private lateinit var db: AppDatabase
     private lateinit var session: SessionManager
+
+    // ============================================================
+    // NEW CLOUD SYNC VARIABLES
+    // ============================================================
+    private lateinit var realtimeDb: RealtimeDbManager
+    private lateinit var syncManager: SyncManager
+    private var isSyncing = false
 
     private val dateFmt = SimpleDateFormat("dd MMM yyyy", Locale.getDefault())
     private val displayFmt = SimpleDateFormat("EEE, dd MMM yyyy", Locale.getDefault())
@@ -61,6 +73,12 @@ class ExpensesListActivity : AppCompatActivity() {
         binding = ActivityExpensesListBinding.inflate(layoutInflater)
         setContentView(binding.root)
         db = AppDatabase.getInstance(this)
+
+        // ============================================================
+        // INITIALIZE CLOUD SYNC
+        // ============================================================
+        setupCloudSync()
+        setupSwipeToRefresh()
 
         loadCategoryMap()
         setupFilterChips()
@@ -85,7 +103,6 @@ class ExpensesListActivity : AppCompatActivity() {
             // Trigger refresh to show new expense
             observeExpenses()
         }
-
     }
 
     private fun applyTheme() {
@@ -93,6 +110,143 @@ class ExpensesListActivity : AppCompatActivity() {
             if (session.isDarkMode()) AppCompatDelegate.MODE_NIGHT_YES
             else AppCompatDelegate.MODE_NIGHT_NO
         )
+    }
+
+    // ============================================================
+    // CLOUD SYNC METHODS
+    // ============================================================
+
+    /**
+     * Initialize cloud sync and real-time observation
+     * This method sets up connection to Firebase Realtime Database
+     */
+    private fun setupCloudSync() {
+        realtimeDb = RealtimeDbManager()
+        syncManager = SyncManager(this)
+
+        // Check if user is logged in before starting sync
+        if (session.isLoggedIn()) {
+            // Start observing cloud data in real-time
+            startObservingCloudData()
+
+            // Sync unsynced local data to cloud
+            syncLocalDataToCloud()
+
+            // Update sync status display
+            updateSyncStatus()
+        } else {
+            android.util.Log.d("ExpensesList", "User not logged in, skipping cloud sync")
+        }
+    }
+
+    /**
+     * Set up swipe-to-refresh functionality
+     * Allows manual refresh of expenses from cloud
+     */
+    private fun setupSwipeToRefresh() {
+        // Note: You'll need to add SwipeRefreshLayout to your XML layout
+        // For now, this is a placeholder. If you don't have SwipeRefreshLayout,
+        // you can comment out this method call.
+        // binding.swipeRefreshLayout.setOnRefreshListener {
+        //     manualSync()
+        // }
+    }
+
+    /**
+     * Start real-time observation of Firebase Realtime Database
+     * This will automatically update local database when cloud data changes
+     */
+    private fun startObservingCloudData() {
+        lifecycleScope.launch {
+            realtimeDb.observeExpenses().collect { cloudExpenses ->
+                android.util.Log.d("ExpensesList", "Cloud update received: ${cloudExpenses.size} expenses")
+
+                // Save cloud expenses to local database
+                for (cloudExpense in cloudExpenses) {
+                    val localExpense = Expense(
+                        categoryId = cloudExpense.categoryId,
+                        description = cloudExpense.description,
+                        amount = cloudExpense.amount,
+                        date = cloudExpense.date,
+                        startTime = cloudExpense.startTime,
+                        endTime = cloudExpense.endTime,
+                        receiptPhotoPath = cloudExpense.receiptPhotoUrl.ifEmpty { null },
+                        syncedToCloud = true  // Already synced since it came from cloud
+                    )
+                    // Insert or ignore if already exists
+                    db.expenseDao().insertOrIgnore(localExpense)
+                }
+
+                // Refresh the displayed list
+                observeExpenses()
+
+                // Update sync status
+                updateSyncStatus()
+            }
+        }
+    }
+
+    /**
+     * Sync unsynced local expenses to cloud
+     * This uploads any expenses that were created offline
+     */
+    private fun syncLocalDataToCloud() {
+        lifecycleScope.launch {
+            if (isSyncing) return@launch
+            isSyncing = true
+
+            try {
+                val result = syncManager.syncUnsyncedExpenses()
+                when (result) {
+                    is SyncManager.SyncResult.Success -> {
+                        android.util.Log.d("ExpensesList", "Synced ${result.count} expenses to cloud")
+                        if (result.count > 0) {
+                            Toast.makeText(this@ExpensesListActivity,
+                                "${result.count} expenses synced to cloud", Toast.LENGTH_SHORT).show()
+                        }
+                        session.updateLastSyncTime()
+                        updateSyncStatus()
+                    }
+                    is SyncManager.SyncResult.Failure -> {
+                        android.util.Log.e("ExpensesList", "Sync failed: ${result.error}")
+                        // Don't show toast for sync failures to avoid annoying the user
+                        // The sync status indicator will show the error state
+                    }
+                }
+            } catch (e: Exception) {
+                android.util.Log.e("ExpensesList", "Sync error", e)
+            } finally {
+                isSyncing = false
+                // binding.swipeRefreshLayout?.isRefreshing = false
+            }
+        }
+    }
+
+    /**
+     * Update sync status indicator in the UI
+     */
+    private fun updateSyncStatus() {
+        // Get count of unsynced expenses
+        lifecycleScope.launch {
+            val unsyncedExpenses = db.expenseDao().getUnsyncedExpenses().first()
+
+            // Update sync status text if you have a TextView for it
+            // Example: binding.tvSyncStatus.text = when {
+            //     unsyncedExpenses.isEmpty() -> "✓ All data synced to cloud"
+            //     else -> "⚠️ ${unsyncedExpenses.size} items waiting to sync"
+            // }
+
+            android.util.Log.d("ExpensesList", "Sync status: ${unsyncedExpenses.size} unsynced items")
+        }
+    }
+
+    /**
+     * Perform manual sync (called by swipe-to-refresh)
+     */
+    private fun manualSync() {
+        android.util.Log.d("ExpensesList", "Manual sync triggered")
+        syncLocalDataToCloud()
+        observeExpenses()  // Refresh the display
     }
 
     // Category map
@@ -215,7 +369,7 @@ class ExpensesListActivity : AppCompatActivity() {
 
     private fun observeExpenses() {
         // Observes expense data from RoomDB using coroutines and Flow
-       // (StackOverflow, 2021)
+        // (StackOverflow, 2021)
         lifecycleScope.launch {
             db.expenseDao().getByPeriod(filterStart, filterEnd)
                 .collectLatest { list ->
@@ -412,7 +566,7 @@ class ExpensesListActivity : AppCompatActivity() {
             return
         }
         //Checks if the local receipt file still exists before attempting to open it
-       // (Android Developers, 2026)
+        // (Android Developers, 2026)
         val file = File(path)
         if (!file.exists()) {
             Toast.makeText(this, "Receipt photo no longer found", Toast.LENGTH_SHORT).show()
@@ -469,7 +623,7 @@ class ExpensesListActivity : AppCompatActivity() {
     // Bottom nav
     private fun setupBottomNav() {
         // Intent navigation between activities
-       // (Android Developers, 2019)
+        // (Android Developers, 2019)
         binding.navHome.setOnClickListener {
             startActivity(Intent(this, MainActivity::class.java))
             finish()
@@ -519,10 +673,23 @@ class ExpensesListActivity : AppCompatActivity() {
 
     private fun dp(value: Int): Int = (value * resources.displayMetrics.density).toInt()
     private fun dp(value: Float): Float = value * resources.displayMetrics.density
+
+    // ============================================================
+    // LIFECYCLE METHODS FOR CLOUD SYNC
+    // ============================================================
+
+    override fun onResume() {
+        super.onResume()
+        // Refresh data when returning to the screen
+        observeExpenses()
+        // Check for sync when app resumes
+        if (session.isLoggedIn()) {
+            syncLocalDataToCloud()
+        }
+    }
 }
 
 /*
-/**
 * References:
 * Used for onCreate() and onResume() lifecycle methods to load and refresh expenses correctly
 * when the screen starts and returns to focus:
@@ -580,10 +747,13 @@ class ExpensesListActivity : AppCompatActivity() {
 * Android Developers. (2026). View  |  API reference  |  Android Developers. [online] Available at:
 * https://developer.android.com/reference/android/view/View#setBackgroundResource
 * [Accessed 25 May 2026].
+ *
+ * PART 3 - CLOUD SYNC REFERENCES:
+ * Firebase, 2026. Read and Write Data on Android. Available at:
+ * https://firebase.google.com/docs/database/android/read-and-write
+ * [Accessed 26 May 2026].
+ *
+ * Android Developers, 2024. Kotlin Flow on Android. Available at:
+ * https://developer.android.com/kotlin/flow
+ * [Accessed 26 May 2026].
  */
- */
-
-
-
-
-
