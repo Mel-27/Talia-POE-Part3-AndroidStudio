@@ -50,7 +50,7 @@ class ExpensesListActivity : AppCompatActivity() {
     private lateinit var session: SessionManager
 
     // ============================================================
-    // NEW CLOUD SYNC VARIABLES
+    // CLOUD SYNC VARIABLES
     // ============================================================
     private lateinit var realtimeDb: RealtimeDbManager
     private lateinit var syncManager: SyncManager
@@ -70,6 +70,19 @@ class ExpensesListActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         session = SessionManager(this)
         applyTheme()
+
+        // ============================================================
+        // CHECK IF USER IS LOGGED IN - REDIRECT TO LOGIN IF NOT
+        // ============================================================
+        if (!session.isLoggedIn()) {
+            android.util.Log.d("ExpensesList", "No user session found, redirecting to login")
+            startActivity(Intent(this, LoginActivity::class.java))
+            finish()
+            return
+        }
+
+        android.util.Log.d("ExpensesList", "User logged in: ${session.getUsername()} (${session.getUserId()})")
+
         binding = ActivityExpensesListBinding.inflate(layoutInflater)
         setContentView(binding.root)
         db = AppDatabase.getInstance(this)
@@ -126,6 +139,7 @@ class ExpensesListActivity : AppCompatActivity() {
 
         // Check if user is logged in before starting sync
         if (session.isLoggedIn()) {
+            android.util.Log.d("ExpensesList", "User logged in, starting cloud sync with userId: ${session.getUserId()}")
             // Start observing cloud data in real-time
             startObservingCloudData()
 
