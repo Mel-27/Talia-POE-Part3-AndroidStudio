@@ -85,6 +85,8 @@ dependencies {
     implementation("io.github.jan-tennert.supabase:postgrest-kt")
     implementation("io.ktor:ktor-client-android:3.1.3")
 
+    // Firebase Realtime Database
+    implementation("com.google.firebase:firebase-database-ktx:21.0.0")
 
     // Coil for loading images from URLs
     implementation("io.coil-kt:coil-compose:2.7.0")

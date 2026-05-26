@@ -19,6 +19,9 @@ import com.gia.poe_demo.data.entities.Category
 import com.gia.poe_demo.data.entities.Expense
 import com.gia.poe_demo.databinding.ActivityAddExpenseBinding
 import com.gia.poe_demo.data.database.AppDatabase
+import com.gia.poe_demo.data.remote.ExpenseModel
+import com.gia.poe_demo.data.util.RealtimeDbManager
+import com.gia.poe_demo.data.util.SyncManager
 import kotlinx.coroutines.launch
 import java.io.File
 import java.text.SimpleDateFormat
@@ -39,6 +42,13 @@ class AddExpenseActivity : AppCompatActivity() {
     // For photo capture
     private var currentPhotoPath: String? = null
     private var categoryAdapter: ArrayAdapter<String>? = null
+
+    // ============================================================
+    // CLOUD SYNC VARIABLES
+    // ============================================================
+    private lateinit var realtimeDb: RealtimeDbManager
+    private lateinit var sessionManager: SessionManager
+    private var isSyncingToCloud = false
 
     // Register activity result launcher for camera
     private val takePictureLauncher = registerForActivityResult(
@@ -74,6 +84,12 @@ class AddExpenseActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         db = AppDatabase.getInstance(this)
+
+        // ============================================================
+        // INITIALIZE CLOUD SYNC
+        // ============================================================
+        realtimeDb = RealtimeDbManager()
+        sessionManager = SessionManager(this)
 
         setupBackButton()
         setupDateAndTimePickers()
@@ -346,6 +362,9 @@ class AddExpenseActivity : AppCompatActivity() {
         }
     }
 
+    // ============================================================
+    // saveExpense() WITH CLOUD SYNC
+    // ============================================================
     private fun saveExpense() {
         val description = binding.etDescription.text.toString().trim()
         val amountText = binding.etAmount.text.toString().trim()
@@ -396,13 +415,24 @@ class AddExpenseActivity : AppCompatActivity() {
             date = expenseDateTimeStamp,
             startTime = startTimeStr,
             endTime = endTimeStr,
-            receiptPhotoPath = currentPhotoPath
+            receiptPhotoPath = currentPhotoPath,
+            syncedToCloud = false  // MARK AS NOT SYNCED YET
         )
 
         lifecycleScope.launch {
             try {
+                // Save to local database first (offline-first approach)
                 val newExpenseId = db.expenseDao().insert(expense)
+                android.util.Log.d("AddExpense", "Expense saved locally with ID: $newExpenseId")
 
+                // ============================================================
+                // CLOUD SYNC TO FIREBASE REALTIME DATABASE
+                // ============================================================
+                syncExpenseToCloud(expense, newExpenseId)
+
+                // ============================================================
+                // SUPABASE STORAGE UPLOAD
+                // ============================================================
                 // Upload receipt to Supabase if a photo was attached
                 val photoPath = currentPhotoPath
                 if (photoPath != null) {
@@ -426,9 +456,11 @@ class AddExpenseActivity : AppCompatActivity() {
                     }
                 }
 
+                // ============================================================
+                // HONEY POINTS AWARD
+                // ============================================================
                 // Award +5 Honey Points for adding an expense
-                // Reference: GamificationManager.POINTS_ADD_EXPENSE
-                val prefs  = getSharedPreferences("BudgetBeePrefs", MODE_PRIVATE)
+                val prefs = getSharedPreferences("BudgetBeePrefs", MODE_PRIVATE)
                 val userId = prefs.getInt("USER_ID", -1)
                 if (userId != -1) {
                     val existing = db.honeyPointsDao().getPointsForUser(userId)
@@ -440,19 +472,83 @@ class AddExpenseActivity : AppCompatActivity() {
                     Log.d("AddExpense", "Awarded ${GamificationManager.POINTS_ADD_EXPENSE} Honey Points to userId=$userId")
                 }
 
-
-
                 android.util.Log.d("AddExpense", "Expense saved: $description - R$amount")
                 android.util.Log.d("AddExpense", "Photo attached: ${currentPhotoPath != null}")
 
                 Toast.makeText(this@AddExpenseActivity, "Expense saved successfully!", Toast.LENGTH_SHORT).show()
                 setResult(RESULT_OK)
                 finish()
+
             } catch (e: Exception) {
                 android.util.Log.e("AddExpense", "Error saving expense", e)
                 Toast.makeText(this@AddExpenseActivity, "Error saving expense: ${e.message}", Toast.LENGTH_SHORT).show()
             }
         }
+    }
+
+    // ============================================================
+    // SYNC EXPENSE TO CLOUD
+    // ============================================================
+
+    /**
+     * Syncs the newly created expense to Firebase Realtime Database
+     * This method runs after local save and uploads to cloud
+     */
+    private suspend fun syncExpenseToCloud(expense: Expense, localId: Long) {
+        if (isSyncingToCloud) return
+        isSyncingToCloud = true
+
+        try {
+            // Get the current user ID from SessionManager
+            val userId = sessionManager.getUserId()
+            if (userId == null) {
+                android.util.Log.w("AddExpense", "User not logged in, skipping cloud sync")
+                return
+            }
+
+            // Get category name and icon for denormalized storage
+            val category = categories.find { it.id == expense.categoryId }
+            val categoryName = category?.name ?: "Unknown"
+            val categoryIcon = category?.iconEmoji ?: "📋"
+
+            // Create cloud model
+            val cloudExpense = ExpenseModel(
+                categoryId = expense.categoryId,
+                categoryName = categoryName,
+                categoryIcon = categoryIcon,
+                description = expense.description,
+                amount = expense.amount,
+                date = expense.date,
+                startTime = expense.startTime,
+                endTime = expense.endTime,
+                receiptPhotoUrl = expense.receiptPhotoPath ?: "",
+                userId = userId
+            )
+
+            // Save to Firebase Realtime Database
+            val result = realtimeDb.saveExpense(cloudExpense)
+
+            if (result.isSuccess) {
+                // Mark local expense as synced
+                db.expenseDao().markAsSynced(localId)
+                android.util.Log.d("AddExpense", "Expense synced to Firebase Cloud: ${result.getOrNull()}")
+            } else {
+                android.util.Log.e("AddExpense", "Cloud sync failed", result.exceptionOrNull())
+                // Local expense remains with syncedToCloud = false
+                // The SyncManager will retry later
+            }
+
+        } catch (e: Exception) {
+            android.util.Log.e("AddExpense", "Error during cloud sync", e)
+        } finally {
+            isSyncingToCloud = false
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // Refresh categories in case new ones were added
+        loadCategories()
     }
 }
 
@@ -472,17 +568,22 @@ Android Ideas (Medium), 2018. findViewById in Kotlin.
 Available at: https://medium.com/android-ideas/findviewbyid-in-kotlin-ce4d22193c79
 [Accessed 27 April 2026].
 
-// Supabase, 2026. Storage Documentation.
-// Available at: https://supabase.com/docs/guides/storage
-// [Accessed 24 May 2026].
+Supabase, 2026. Storage Documentation.
+Available at: https://supabase.com/docs/guides/storage
+[Accessed 24 May 2026].
 
-// supabase-community, 2026. supabase-kt GitHub Repository.
-// Available at: https://github.com/supabase-community/supabase-kt
-// [Accessed 24 May 2026].
+supabase-community, 2026. supabase-kt GitHub Repository.
+Available at: https://github.com/supabase-community/supabase-kt
+[Accessed 24 May 2026].
 
-// Supabase, 2026. storage-from-upload (Kotlin reference).
-// Available at: https://supabase.com/docs/reference/kotlin/storage-from-upload
-// [Accessed 24 May 2026].
+Supabase, 2026. storage-from-upload (Kotlin reference).
+Available at: https://supabase.com/docs/reference/kotlin/storage-from-upload
+[Accessed 24 May 2026].
+
+//CLOUD SYNC REFERENCES:
+Firebase, 2026. Read and Write Data on Android.
+Available at: https://firebase.google.com/docs/database/android/read-and-write
+[Accessed 26 May 2026].
 
  */
 

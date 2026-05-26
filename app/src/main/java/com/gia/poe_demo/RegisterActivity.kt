@@ -48,6 +48,7 @@ class RegisterActivity : AppCompatActivity() {
                     btnRegister.isEnabled = false
                 }
                 is AuthViewModel.AuthState.Success -> {
+                    // Save to SharedPreferences (existing)
                     getSharedPreferences("BudgetBeePrefs", MODE_PRIVATE).edit()
                         .putBoolean("isRegistered", true)
                         .putString("loggedInUsername", state.username)
@@ -55,6 +56,18 @@ class RegisterActivity : AppCompatActivity() {
                         .putString("loggedInEmail", state.user?.email ?: "")
                         .putString("firebaseUid", state.user?.uid)
                         .apply()
+
+                    // ============================================================
+                    // Save user session to SessionManager for cloud sync
+                    // ============================================================
+                    val sessionManager = SessionManager(this@RegisterActivity)
+                    sessionManager.saveUserSession(
+                        userId = state.user?.uid ?: "",
+                        username = state.username,
+                        email = state.user?.email ?: "",
+                        fullName = state.fullName
+                    )
+                    android.util.Log.d("RegisterActivity", "User session saved: ${state.username} (${state.user?.uid})")
 
                     startActivity(Intent(this, MainActivity::class.java))
                     finish()

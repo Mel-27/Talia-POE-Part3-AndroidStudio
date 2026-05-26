@@ -8,6 +8,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
 import com.gia.poe_demo.data.entities.Category
+import kotlinx.coroutines.flow.Flow
 
 /**
  * CategoryDao - Data Access Object for Category CRUD operations.
@@ -37,4 +38,23 @@ interface CategoryDao {
 
     @Query("SELECT COUNT(*) FROM categories")
     suspend fun getCount(): Int
+
+    /**
+     * Insert or ignore if category already exists
+     * Used for cloud sync to avoid duplicates
+     */
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insertOrIgnore(category: Category): Long
+
+    /**
+     * Mark a category as synced to cloud
+     */
+    @Query("UPDATE categories SET syncedToCloud = 1 WHERE id = :categoryId")
+    suspend fun markAsSynced(categoryId: Long)
+
+    /**
+     * Get all categories that haven't been synced to cloud yet
+     */
+    @Query("SELECT * FROM categories WHERE syncedToCloud = 0")
+    fun getUnsyncedCategories(): Flow<List<Category>>
 }
