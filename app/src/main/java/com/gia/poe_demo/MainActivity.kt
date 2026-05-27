@@ -12,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
 import androidx.lifecycle.lifecycleScope
 import com.gia.poe_demo.data.database.AppDatabase
+import com.gia.poe_demo.data.util.SyncManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -21,9 +22,21 @@ import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
+/**
+ * MainActivity — dashboard screen showing budget summary, top categories,
+ * recent transactions, and upcoming reminders.
+ * Now triggers a startup sync to Firebase Realtime Database on launch.
+ * Reference: IIE PROG7313 Module Manual (2026)
+ * Reference: Firebase Realtime Database Android Docs - https://firebase.google.com/docs/database/android/start
+ * Reference: Android Developers. SharedPreferences. Available at:
+ * https://developer.android.com/training/data-storage/shared-preferences. [Accessed 27 Apr. 2026]
+ * Reference: Android Developers. (2019). Understand the Activity Lifecycle. Available at:
+ * https://developer.android.com/guide/components/activities/activity-lifecycle. [Accessed 27 Apr. 2026]
+ */
 class MainActivity : AppCompatActivity() {
 
     private lateinit var db: AppDatabase
+    private lateinit var syncManager: SyncManager
     private val currencyFormat = NumberFormat.getNumberInstance(Locale("en", "ZA"))
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -31,39 +44,60 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         db = AppDatabase.getInstance(this)
+        syncManager = SyncManager(this)
 
         setupNavigation()
         loadUserData()
         loadDashboardSummary()
         loadUpcomingReminders()
+        triggerStartupSync()
     }
 
     override fun onResume() {
         super.onResume()
-        // Refresh data every time the user comes back to this screen
         loadUserData()
         loadDashboardSummary()
         loadUpcomingReminders()
     }
 
+    /**
+     * Syncs any unsynced local expenses to Firebase Realtime Database on app startup.
+     * Runs in the background via coroutine — does not block the UI.
+     * Reference: Firebase Realtime Database Android Docs - https://firebase.google.com/docs/database/android/start
+     * Reference: IIE PROG7313 Module Manual (2026)
+     */
+    private fun triggerStartupSync() {
+        lifecycleScope.launch {
+            val result = syncManager.syncUnsyncedExpenses()
+            when (result) {
+                is SyncManager.SyncResult.Success -> {
+                    android.util.Log.d(
+                        "MainActivity",
+                        "Startup sync complete: ${result.count} expense(s) synced"
+                    )
+                }
+                is SyncManager.SyncResult.Failure -> {
+                    android.util.Log.e(
+                        "MainActivity",
+                        "Startup sync failed: ${result.error}"
+                    )
+                }
+            }
+        }
+    }
+
     private fun loadUserData() {
-        // grabbing the logged in user info from SharedPreferences
-        // ref: https://developer.android.com/training/data-storage/shared-preferences
         val prefs = getSharedPreferences("BudgetBeePrefs", MODE_PRIVATE)
         val loggedInUsername = prefs.getString("loggedInUsername", "") ?: ""
         val loggedInFullName = prefs.getString("loggedInFullName", "") ?: ""
 
-        // display name — use fullName if available, otherwise fall back to username
         val displayName = if (loggedInFullName.isNotEmpty()) loggedInFullName else loggedInUsername
         val firstName = displayName.split(" ").firstOrNull() ?: displayName
 
-        // set greeting and avatar initial from SharedPreferences immediately
-        // ref: https://developer.android.com/reference/android/view/View#findViewById(int)
         findViewById<TextView>(R.id.tvUserName)?.text = "$firstName 🐝"
         val initial = displayName.firstOrNull()?.uppercaseChar()?.toString() ?: "?"
         findViewById<TextView>(R.id.tvAvatarInitial)?.text = initial
 
-        // also load streak from DB if needed
         val userId = prefs.getInt("USER_ID", -1)
         if (userId == -1) return
 
@@ -78,7 +112,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun loadDashboardSummary() {
-
         val cal = Calendar.getInstance()
 
         val startOfMonth = Calendar.getInstance().apply {
@@ -98,11 +131,8 @@ class MainActivity : AppCompatActivity() {
         )
 
         lifecycleScope.launch {
-
             db.expenseDao().getByPeriod(startOfMonth, now).collect { expenses ->
-
                 val totalSpent = expenses.sumOf { it.amount }
-
 
                 val goal = withContext(Dispatchers.IO) {
                     db.budgetGoalDao().getGoalForMonth(monthYear)
@@ -114,7 +144,6 @@ class MainActivity : AppCompatActivity() {
                 val progress = if (budget > 0)
                     ((totalSpent / budget) * 100).toInt().coerceIn(0, 100)
                 else 0
-
 
                 findViewById<TextView>(R.id.tvBalanceAmount)?.text =
                     if (budget == 0.0) "No budget set"
@@ -190,7 +219,6 @@ class MainActivity : AppCompatActivity() {
                         ).also { it.bottomMargin = (12 * density).toInt() }
                     }
 
-                    // Emoji badge
                     val badge = CardView(this@MainActivity).apply {
                         radius = (13 * density)
                         setCardBackgroundColor(0xFFFFF3D0.toInt())
@@ -209,7 +237,6 @@ class MainActivity : AppCompatActivity() {
                     }
                     row.addView(badge)
 
-                    // Info column
                     val info = LinearLayout(this@MainActivity).apply {
                         orientation = LinearLayout.VERTICAL
                         layoutParams = LinearLayout.LayoutParams(
@@ -244,7 +271,6 @@ class MainActivity : AppCompatActivity() {
                     info.addView(pb)
                     row.addView(info)
 
-                    // Amount
                     row.addView(TextView(this@MainActivity).apply {
                         text = "R${currencyFormat.format(total.total)}"
                         textSize = 16f
