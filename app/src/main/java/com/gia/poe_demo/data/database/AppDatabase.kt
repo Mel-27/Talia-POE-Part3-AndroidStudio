@@ -55,18 +55,18 @@ abstract class AppDatabase : RoomDatabase() {
         // In AppDatabase.kt
         fun getDatabase(context: Context): AppDatabase {
             return INSTANCE ?: synchronized(this) {
-                Room.databaseBuilder(
+                val instance = Room.databaseBuilder(
                     context.applicationContext,
                     AppDatabase::class.java,
-                    "budgetbee_db"
+                    "budgetbee_database"
                 )
-
-
-                   // .fallbackToDestructiveMigration()  // Deletes old data on version change
-                  //  .fallbackToDestructiveMigrationOnDowngrade()
+                    .fallbackToDestructiveMigration()
                     .build()
-            } ?: INSTANCE!!
+                INSTANCE = instance
+                instance
+            }
         }
+        
 
 
 

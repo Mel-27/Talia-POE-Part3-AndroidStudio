@@ -20,5 +20,6 @@ data class Expense(
     val startTime: String = "", // e.g. "10:30"
     val endTime: String = "", // e.g. "11:00"
     val receiptPhotoPath: String? = null, // null = no photo attached
-    val createdAt: Long = System.currentTimeMillis()
+    val createdAt: Long = System.currentTimeMillis(),
+    val syncedToCloud: Boolean = false
 )

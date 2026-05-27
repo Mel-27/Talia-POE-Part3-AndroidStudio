@@ -16,6 +16,7 @@ data class Category(
     val name: String,
     val iconEmoji: String = "\uD83D\uDED2",
     val monthlyLimit: Double = 0.0, // optional spending cap
-    val createdAt: Long = System.currentTimeMillis()
+    val createdAt: Long = System.currentTimeMillis(),
+    val syncedToCloud: Boolean = false
 )
 

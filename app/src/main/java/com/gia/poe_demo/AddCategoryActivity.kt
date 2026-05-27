@@ -13,13 +13,17 @@ import kotlinx.coroutines.launch
 import com.gia.poe_demo.data.entities.Category
 import com.gia.poe_demo.AddExpenseActivity
 import com.gia.poe_demo.data.database.AppDatabase
+import com.gia.poe_demo.data.remote.CategoryModel
+import com.gia.poe_demo.data.util.RealtimeDbManager
 
 
 /**
  * AddCategoryActivity - creating a new expense category.
  * Features: name input, budget limit, emoji icon picker with tabs.
- * Saves to local RoomDB via CategoryDao.
+ * Saves to local RoomDB via CategoryDao, then syncs to Firebase Realtime Database.
  * Reference: IIE PROG7313 Module Manual (2026)
+ * Reference: Firebase Realtime Database Android Docs - https://firebase.google.com/docs/database/android/start
+ * Reference: Android Room Persistence Library - https://developer.android.com/training/data-storage/room
  */
 
 class AddCategoryActivity : AppCompatActivity() {
@@ -27,12 +31,12 @@ class AddCategoryActivity : AppCompatActivity() {
     private lateinit var binding: ActivityCategoriesBinding
     private lateinit var db: AppDatabase
     private lateinit var session: SessionManager
+    private lateinit var realtimeDb: RealtimeDbManager
 
     private var selectedEmoji = "🛒"
     private var selectedLabel = "Cart"
     private var currentIcons = listOf<Pair<String, String>>()
 
-    // Icon lists per tab
     private val foodIcons = listOf(
         "🛒" to "Cart", "🍕" to "Pizza", "☕" to "Coffee", "🍔" to "Burger",
         "🥗" to "Salad", "🍷" to "Wine", "🍣" to "Sushi", "🥐" to "Bakery",
@@ -72,6 +76,7 @@ class AddCategoryActivity : AppCompatActivity() {
         binding = ActivityCategoriesBinding.inflate(layoutInflater)
         setContentView(binding.root)
         db = AppDatabase.getInstance(this)
+        realtimeDb = RealtimeDbManager()
 
         currentIcons = foodIcons
         loadIconGrid(foodIcons)
@@ -127,6 +132,7 @@ class AddCategoryActivity : AppCompatActivity() {
     /**
      * Dynamically builds the icon grid inside iconGridContainer.
      * 5 icons per row using LinearLayout weights.
+     * Reference: Android LinearLayout Documentation - https://developer.android.com/reference/android/widget/LinearLayout
      */
     private fun loadIconGrid(icons: List<Pair<String, String>>) {
         val container = binding.iconGridContainer
@@ -147,7 +153,6 @@ class AddCategoryActivity : AppCompatActivity() {
             }
             row?.addView(buildCell(emoji, label))
         }
-        // Fill empty cells in last row
         val rem = icons.size % columns
         if (rem != 0) {
             repeat(columns - rem) {
@@ -202,7 +207,10 @@ class AddCategoryActivity : AppCompatActivity() {
     }
 
     /**
-     * Validates inputs then inserts a new Category into RoomDB.
+     * Validates inputs, inserts Category into local RoomDB, then syncs to Firebase.
+     * Reference: IIE PROG7313 Module Manual (2026)
+     * Reference: Firebase Realtime Database Write Data - https://firebase.google.com/docs/database/android/read-and-write
+     * Reference: Kotlin Coroutines - https://developer.android.com/kotlin/coroutines
      */
     private fun setupSaveButton() {
         binding.btnSaveCategory.setOnClickListener {
@@ -226,13 +234,17 @@ class AddCategoryActivity : AppCompatActivity() {
                 val cat = Category(
                     name = name,
                     iconEmoji = selectedEmoji,
-                    monthlyLimit = limit
+                    monthlyLimit = limit,
+                    syncedToCloud = false
                 )
                 val newId = db.categoryDao().insert(cat)
                 android.util.Log.d(
                     "AddCategory",
-                    "Category saved id=$newId name=$name emoji=$selectedEmoji limit=$limit"
+                    "Category saved locally id=$newId name=$name emoji=$selectedEmoji limit=$limit"
                 )
+
+                syncCategoryToCloud(cat, newId)
+
                 runOnUiThread {
                     Toast.makeText(
                         this@AddCategoryActivity,
@@ -242,6 +254,35 @@ class AddCategoryActivity : AppCompatActivity() {
                     finish()
                 }
             }
+        }
+    }
+
+    /**
+     * Syncs a newly saved category to Firebase Realtime Database.
+     * Marks as synced locally on success; logs warning on failure for retry later.
+     * Reference: Firebase Realtime Database Android Docs - https://firebase.google.com/docs/database/android/start
+     * Reference: IIE PROG7313 Module Manual (2026)
+     */
+    private suspend fun syncCategoryToCloud(category: Category, localId: Long) {
+        val userId = session.getUserId()
+        if (userId == null) {
+            android.util.Log.w("AddCategory", "User not logged in — skipping cloud sync")
+            return
+        }
+
+        val cloudCategory = CategoryModel(
+            name = category.name,
+            iconEmoji = category.iconEmoji,
+            monthlyLimit = category.monthlyLimit,
+            userId = userId
+        )
+
+        val result = realtimeDb.saveCategory(cloudCategory)
+        if (result.isSuccess) {
+            db.categoryDao().markAsSynced(localId)
+            android.util.Log.d("AddCategory", "Category synced to cloud: ${result.getOrNull()}")
+        } else {
+            android.util.Log.e("AddCategory", "Cloud sync failed — will retry on next sync", result.exceptionOrNull())
         }
     }
 

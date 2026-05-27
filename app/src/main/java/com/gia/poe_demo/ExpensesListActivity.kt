@@ -1,11 +1,17 @@
 package com.gia.poe_demo
 
 import android.app.DatePickerDialog
+import android.content.BroadcastReceiver
+import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
+import android.net.ConnectivityManager
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
+import android.widget.Button
 import android.widget.LinearLayout
+import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -13,15 +19,19 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.cardview.widget.CardView
 import androidx.core.content.FileProvider
 import androidx.lifecycle.lifecycleScope
-
 import com.gia.poe_demo.databinding.ActivityExpensesListBinding
 import com.gia.poe_demo.data.database.AppDatabase
 import com.gia.poe_demo.data.entities.CategoryTotal
 import com.gia.poe_demo.data.entities.Expense
+import com.gia.poe_demo.data.remote.ExpenseModel
+import com.gia.poe_demo.data.util.RealtimeDbManager
+import com.gia.poe_demo.data.util.OfflineTestHelper
+import com.gia.poe_demo.util.SyncManager
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import java.io.File
 import java.text.SimpleDateFormat
-import kotlinx.coroutines.flow.collectLatest
 import java.util.*
 
 
@@ -36,8 +46,21 @@ import java.util.*
  *  - RECEIPT link on cards — taps open the stored photo in a system image viewer
  *  - "+ ADD EXPENSE CATEGORY" button navigates to AddCategoryActivity
  *  - Light/dark theme applied from SessionManager
+ *  - Sync status indicator showing cloud sync state
+ *  - Manual sync button for offline recovery
+ *  - Network connectivity receiver — auto-syncs when internet reconnects
+ *  - isSyncing flag prevents duplicate cloud sync calls
  *
  * Reference: IIE PROG7313 Module Manual (2026)
+ * Reference: Firebase Realtime Database Android Docs - https://firebase.google.com/docs/database/android/start
+ * Reference: Android Developers. (2019). Understand the Activity Lifecycle. Available at: https://developer.android.com/guide/components/activities/activity-lifecycle. [Accessed 27 Apr. 2026]
+ * Reference: Android Developers. (2019). Intents and Intent Filters. Available at: https://developer.android.com/guide/components/intents-filters. [Accessed 27 Apr. 2026]
+ * Reference: David (2021). Using coroutines with Android Room database. Stack Overflow. Available at: https://stackoverflow.com/questions/68126665/using-coroutines-with-android-room-database. [Accessed 27 Apr. 2026]
+ * Reference: Guendouz, M. (2018). Room, LiveData, and RecyclerView. Medium. Available at: https://medium.com/@guendouz/room-livedata-and-recyclerview-d8e96fb31dfe. [Accessed 26 Apr. 2026]
+ * Reference: Meyta Taliti (2022). Simple List with Date Range Filter. Medium. Available at: https://medium.com/@meytataliti/simple-list-with-date-range-filter-19bd71761495. [Accessed 27 Apr. 2026]
+ * Reference: user1061793 (2012). How to add days into the date in android. Stack Overflow. Available at: https://stackoverflow.com/questions/8738369/how-to-add-days-into-the-date-in-android. [Accessed 27 Apr. 2026]
+ * Reference: Android Developers. (2024). Pick a date or time. Available at: https://developer.android.com/develop/ui/views/components/pickers. [Accessed 27 Apr. 2026]
+ * Reference: Android Developers. (2024). BroadcastReceiver. Available at: https://developer.android.com/reference/android/content/BroadcastReceiver. [Accessed 27 Apr. 2026]
  */
 
 class ExpensesListActivity : AppCompatActivity() {
@@ -45,16 +68,20 @@ class ExpensesListActivity : AppCompatActivity() {
     private lateinit var binding: ActivityExpensesListBinding
     private lateinit var db: AppDatabase
     private lateinit var session: SessionManager
+    private lateinit var realtimeDb: RealtimeDbManager
+    private lateinit var syncManager: SyncManager
+    private lateinit var networkReceiver: BroadcastReceiver
+    private var isSyncing = false
 
     private val dateFmt = SimpleDateFormat("dd MMM yyyy", Locale.getDefault())
     private val displayFmt = SimpleDateFormat("EEE, dd MMM yyyy", Locale.getDefault())
 
     private var filterStart = startOfMonth()
     private var filterEnd = System.currentTimeMillis()
-    private var sortDesc = true    // newest first
+    private var sortDesc = true
 
     private var expenses = listOf<Expense>()
-    private var categoryMap = mapOf<Long, String>()   // id → "emoji name"
+    private var categoryMap = mapOf<Long, String>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -63,14 +90,17 @@ class ExpensesListActivity : AppCompatActivity() {
         binding = ActivityExpensesListBinding.inflate(layoutInflater)
         setContentView(binding.root)
         db = AppDatabase.getInstance(this)
+        realtimeDb = RealtimeDbManager()
+        syncManager = SyncManager(this)
 
         loadCategoryMap()
         setupFilterChips()
         setupSortButtons()
         setupAddCategoryButton()
         setupBottomNav()
+        setupSyncUI()
+        registerNetworkReceiver()
 
-        // Hide static placeholder cards from the XML layout
         listOf(
             binding.cardExpense1, binding.cardExpense2,
             binding.cardExpense3, binding.cardExpense4
@@ -78,13 +108,12 @@ class ExpensesListActivity : AppCompatActivity() {
 
         observeExpenses()
 
-        // Handle new expense from AddExpenseActivity
         val newExpenseId = intent.getLongExtra("SHOW_NEW_EXPENSE", -1L)
         if (newExpenseId != -1L) {
-            // Trigger refresh to show new expense
             observeExpenses()
         }
 
+        syncLocalDataToCloud()
     }
 
     private fun applyTheme() {
@@ -94,7 +123,39 @@ class ExpensesListActivity : AppCompatActivity() {
         )
     }
 
-    // Category map
+    /**
+     * Registers a BroadcastReceiver that listens for connectivity changes.
+     * When the device reconnects to the internet, unsynced local expenses
+     * are automatically pushed to Firebase Realtime Database.
+     * Reference: Android Developers. (2024). BroadcastReceiver. Available at:
+     * https://developer.android.com/reference/android/content/BroadcastReceiver. [Accessed 27 Apr. 2026]
+     * Reference: IIE PROG7313 Module Manual (2026)
+     */
+    private fun registerNetworkReceiver() {
+        networkReceiver = object : BroadcastReceiver() {
+            override fun onReceive(context: Context?, intent: Intent?) {
+                if (OfflineTestHelper.isNetworkAvailable(this@ExpensesListActivity)) {
+                    android.util.Log.d("ExpensesList", "Network reconnected — auto-syncing")
+                    syncLocalDataToCloud()
+                }
+            }
+        }
+        @Suppress("DEPRECATION")
+        registerReceiver(
+            networkReceiver,
+            IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION)
+        )
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        try {
+            unregisterReceiver(networkReceiver)
+        } catch (e: Exception) {
+            android.util.Log.w("ExpensesList", "Receiver already unregistered: ${e.message}")
+        }
+    }
+
     private fun loadCategoryMap() {
         lifecycleScope.launch {
             val cats = db.categoryDao().getAll()
@@ -104,7 +165,6 @@ class ExpensesListActivity : AppCompatActivity() {
         }
     }
 
-    // Filter chips
     private fun setupFilterChips() {
         binding.chipThisMonth.setOnClickListener {
             filterStart = startOfMonth()
@@ -168,7 +228,6 @@ class ExpensesListActivity : AppCompatActivity() {
         }, cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH)).show()
     }
 
-    // Sort buttons
     private fun setupSortButtons() {
         binding.btnSortDesc.setOnClickListener {
             sortDesc = true
@@ -192,7 +251,6 @@ class ExpensesListActivity : AppCompatActivity() {
         binding.tvSortAsc.setTextColor(getColor(if (!sortDesc) R.color.black_deep else R.color.muted_text))
     }
 
-
     private fun observeExpenses() {
         lifecycleScope.launch {
             db.expenseDao().getByPeriod(filterStart, filterEnd)
@@ -200,7 +258,7 @@ class ExpensesListActivity : AppCompatActivity() {
                     expenses = list
                     renderExpenses()
                     updateSummary(expenses)
-                    loadCategoryTotals() // you forgot this call before
+                    loadCategoryTotals()
                 }
         }
     }
@@ -209,7 +267,6 @@ class ExpensesListActivity : AppCompatActivity() {
         lifecycleScope.launch {
             db.expenseDao().getCategoryTotalsForPeriod(filterStart, filterEnd)
                 .collectLatest { totals ->
-
                     if (totals.isNotEmpty()) {
                         updateCategorySummary(totals)
                     } else {
@@ -230,7 +287,77 @@ class ExpensesListActivity : AppCompatActivity() {
         android.util.Log.d("ExpensesList", "Category totals: ${totals.size} categories")
     }
 
-    // Build expense cards
+    /**
+     * Sets up the sync status indicator and manual sync button.
+     * Observes unsynced expenses from RoomDB and updates the UI label accordingly.
+     * Reference: Firebase Realtime Database Android Docs - https://firebase.google.com/docs/database/android/start
+     * Reference: IIE PROG7313 Module Manual (2026)
+     */
+    private fun setupSyncUI() {
+        updateSyncStatus()
+        setupManualSyncButton()
+    }
+
+    private fun updateSyncStatus() {
+        lifecycleScope.launch {
+            db.expenseDao().getUnsyncedExpenses().collect { unsynced ->
+                val count = unsynced.size
+                val tvSyncStatus = findViewById<TextView>(R.id.tvSyncStatus)
+                val syncProgressBar = findViewById<ProgressBar>(R.id.syncProgressBar)
+
+                if (count == 0) {
+                    tvSyncStatus.text = "✓ All data synced to cloud"
+                    tvSyncStatus.setTextColor(getColor(R.color.success_green))
+                    syncProgressBar?.visibility = View.GONE
+                } else {
+                    tvSyncStatus.text = "⚠️ $count items waiting to sync"
+                    tvSyncStatus.setTextColor(getColor(R.color.honey_dark))
+                    syncProgressBar?.visibility = View.GONE
+                }
+            }
+        }
+    }
+
+    private fun setupManualSyncButton() {
+        findViewById<Button>(R.id.btnManualSync)?.setOnClickListener {
+            Toast.makeText(this, "Syncing...", Toast.LENGTH_SHORT).show()
+            syncLocalDataToCloud()
+        }
+    }
+
+    /**
+     * Syncs unsynced local expenses to Firebase Realtime Database.
+     * Uses isSyncing flag to prevent duplicate concurrent sync calls.
+     * Reference: Firebase Realtime Database Android Docs - https://firebase.google.com/docs/database/android/start
+     * Reference: IIE PROG7313 Module Manual (2026)
+     */
+    private fun syncLocalDataToCloud() {
+        if (isSyncing) return
+        isSyncing = true
+
+        lifecycleScope.launch {
+            val result = syncManager.syncUnsyncedExpenses()
+            when (result) {
+                is SyncManager.SyncResult.Success -> {
+                    android.util.Log.d("ExpensesList", "Synced ${result.count} expenses to cloud")
+                    if (result.count > 0) {
+                        runOnUiThread {
+                            Toast.makeText(
+                                this@ExpensesListActivity,
+                                "${result.count} expense(s) synced to cloud",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                    }
+                }
+                is SyncManager.SyncResult.Failure -> {
+                    android.util.Log.e("ExpensesList", "Sync failed: ${result.error}")
+                }
+            }
+            isSyncing = false
+        }
+    }
+
     private fun renderExpenses() {
         val container = getOrCreateDynamicContainer()
         container.removeAllViews()
@@ -301,7 +428,6 @@ class ExpensesListActivity : AppCompatActivity() {
             setPadding(dp(14), dp(14), dp(14), dp(14))
         }
 
-        // Category emoji badge
         val catDisplay = categoryMap[exp.categoryId] ?: "📋 Expense"
         val emoji = if (catDisplay.length >= 2) catDisplay.take(2) else "📋"
         row.addView(CardView(context).apply {
@@ -320,7 +446,6 @@ class ExpensesListActivity : AppCompatActivity() {
             })
         })
 
-        // Description + category + date + optional receipt link
         val info = LinearLayout(context).apply {
             orientation = LinearLayout.VERTICAL
             layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
@@ -337,7 +462,6 @@ class ExpensesListActivity : AppCompatActivity() {
             setTextColor(getColor(R.color.muted_text))
         })
 
-        // Time display if available
         if (exp.startTime.isNotEmpty() && exp.endTime.isNotEmpty()) {
             info.addView(TextView(context).apply {
                 text = "⏰ ${exp.startTime} - ${exp.endTime}"
@@ -346,7 +470,6 @@ class ExpensesListActivity : AppCompatActivity() {
             })
         }
 
-        // RECEIPT tap target — only shown when a photo was stored
         if (exp.receiptPhotoPath != null && exp.receiptPhotoPath.isNotEmpty()) {
             info.addView(TextView(context).apply {
                 text = "📎 RECEIPT"
@@ -364,7 +487,6 @@ class ExpensesListActivity : AppCompatActivity() {
         }
         row.addView(info)
 
-        // Amount (right aligned)
         row.addView(TextView(context).apply {
             text = "-R${"%.0f".format(exp.amount)}"
             textSize = 15f
@@ -396,28 +518,24 @@ class ExpensesListActivity : AppCompatActivity() {
         startActivity(Intent.createChooser(intent, "View Receipt"))
     }
 
-    // Summary bar
     private fun updateSummary(list: List<Expense>) {
         val total = list.sumOf { it.amount }
         val days = ((filterEnd - filterStart) / 86_400_000L).coerceAtLeast(1)
         binding.tvTotalExpenses.text = "R${"%.0f".format(total)}"
         binding.tvTotalItems.text = list.size.toString()
         binding.tvAvgPerDay.text = "R${"%.0f".format(total / days)}"
-
         android.util.Log.d(
             "ExpensesList",
             "Summary - Total: $total, Items: ${list.size}, Avg: ${total / days}"
         )
     }
 
-    // Add category button
     private fun setupAddCategoryButton() {
         binding.btnAddCategory.setOnClickListener {
             startActivity(Intent(this, AddCategoryActivity::class.java))
         }
     }
 
-    // Bottom nav
     private fun setupBottomNav() {
         binding.navHome.setOnClickListener {
             startActivity(Intent(this, MainActivity::class.java))
@@ -436,7 +554,6 @@ class ExpensesListActivity : AppCompatActivity() {
         }
     }
 
-    // Helpers
     private fun dayLabel(millis: Long): String {
         val today = Calendar.getInstance()
         val d = Calendar.getInstance().apply { timeInMillis = millis }
@@ -469,44 +586,3 @@ class ExpensesListActivity : AppCompatActivity() {
     private fun dp(value: Int): Int = (value * resources.displayMetrics.density).toInt()
     private fun dp(value: Float): Float = value * resources.displayMetrics.density
 }
-
-/*
-/**
-* References:
-* Used for onCreate() and onResume() lifecycle methods to load and refresh expenses correctly
-* when the screen starts and returns to focus:
-* Android Developers. (2019). Understand the Activity Lifecycle  |  Android Developers. Available at:
-* https://developer.android.com/guide/components/activities/activity-lifecycle.
-* [Accessed 27 Apr. 2026]
-*
-* Used for Intent navigation when opening ReceiptViewActivity and passing data (photoPath)
-* between screens:
-* Android Developers. (2019). Intents and Intent Filters  |  Android Developers. Available at:
-* https://developer.android.com/guide/components/intents-filters.
-* [Accessed 27 Apr. 2026]
-*
-* Used for loading Room database data asynchronously using coroutines (lifecycleScope):
-* David (2021). Using coroutines with Android Room database. Stack Overflow. Available at:
-* https://stackoverflow.com/questions/68126665/using-coroutines-with-android-room-database.
-* [Accessed 27 Apr. 2026]
-*
-* Used for loading data from Room database when the expense list changes:
-* Guendouz, M. (2018). Room, LiveData, and RecyclerView. Medium. Available at:
-* https://medium.com/@guendouz/room-livedata-and-recyclerview-d8e96fb31dfe
-* [Accessed 26 Apr. 2026]
-*
-* Used for implementing data filtering logic:
-* Meyta Taliti (2022). Simple List with Date Range Filter - Meyta Taliti - Medium. Medium. Available at:
-* https://medium.com/@meytataliti/simple-list-with-date-range-filter-19bd71761495.
-* [Accessed 27 Apr. 2026]
-*
-* user1061793 (2012). How to add days into the date in android. Stack Overflow. Available at:
-* https://stackoverflow.com/questions/8738369/how-to-add-days-into-the-date-in-android.
-* [Accessed 27 Apr. 2026]
-*
-* Used for implementing the Material date picker for custom date range selection:
-* Android Developers. (2024). Pick a date or time | Android Developers. Available at:
-* https://developer.android.com/develop/ui/views/components/pickers.
-* [Accessed 27 Apr. 2026]
-*/
- */

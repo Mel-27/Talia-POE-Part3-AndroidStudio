@@ -37,4 +37,10 @@ interface CategoryDao {
 
     @Query("SELECT COUNT(*) FROM categories")
     suspend fun getCount(): Int
+
+    @Query("UPDATE categories SET syncedToCloud = 1 WHERE id = :categoryId")
+    suspend fun markAsSynced(categoryId: Long)
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insertOrIgnore(category: Category): Long
 }

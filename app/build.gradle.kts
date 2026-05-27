@@ -1,9 +1,9 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
-    id("kotlin-kapt")
+    alias(libs.plugins.ksp)
     id("com.google.gms.google-services")
-    kotlin("plugin.serialization") version "2.0.21"
+    kotlin("plugin.serialization") version "2.1.10"
 }
 
 android {
@@ -41,6 +41,12 @@ android {
     buildFeatures {
         viewBinding = true
     }
+
+    configurations.all {
+        resolutionStrategy {
+            force("androidx.browser:browser:1.8.0")
+        }
+    }
 }
 
 dependencies {
@@ -55,7 +61,7 @@ dependencies {
     // Room
     implementation(libs.room.runtime)
     implementation(libs.room.ktx)
-    kapt(libs.room.compiler)
+    ksp(libs.room.compiler)
 
     // Lifecycle
     implementation(libs.lifecycle.viewmodel.ktx)
@@ -70,14 +76,16 @@ dependencies {
     implementation(platform("com.google.firebase:firebase-bom:33.7.0"))
     implementation("com.google.firebase:firebase-auth")
     implementation("com.google.firebase:firebase-analytics")
+    implementation("com.google.firebase:firebase-database-ktx")
 
     // Supabase
-    implementation(platform("io.github.jan-tennert.supabase:bom:3.6.0"))
+    implementation(platform("io.github.jan-tennert.supabase:bom:2.5.4"))
     implementation("io.github.jan-tennert.supabase:storage-kt")
     implementation("io.github.jan-tennert.supabase:postgrest-kt")
-    implementation("io.ktor:ktor-client-android:3.4.3")
+    implementation("io.ktor:ktor-client-android:2.3.12")
 
-
-    // Coil for loading images from URLs
+    // Coil
     implementation("io.coil-kt:coil-compose:2.7.0")
+
+    implementation("androidx.browser:browser:1.8.0")
 }
