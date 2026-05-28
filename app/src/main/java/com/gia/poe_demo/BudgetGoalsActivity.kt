@@ -40,14 +40,6 @@ class BudgetGoalsActivity : AppCompatActivity() {
         setupButton()
         loadData()
 
-        // Load and display previously saved budget goals on screen start
-        val prefs = getSharedPreferences("budget_prefs", MODE_PRIVATE)
-        val savedMin = prefs.getFloat("min_budget", -1f)
-        val savedMax = prefs.getFloat("max_budget", -1f)
-
-        if (savedMin != -1f && savedMax != -1f) {
-            showSavedGoals(savedMin.toDouble(), savedMax.toDouble())
-        }
     }
 
     private fun setupNavigation() {
