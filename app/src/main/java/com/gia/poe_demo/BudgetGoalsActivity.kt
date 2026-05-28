@@ -171,6 +171,24 @@ class BudgetGoalsActivity : AppCompatActivity() {
                 .putFloat("max_budget", max.toFloat())
                 .apply()
 
+            val monthYear = String.format(
+                Locale.getDefault(), "%d-%02d",
+                Calendar.getInstance().get(Calendar.YEAR),
+                Calendar.getInstance().get(Calendar.MONTH) + 1
+            )
+
+            lifecycleScope.launch(Dispatchers.IO) {
+                db.budgetGoalDao().insertOrUpdate(
+                    BudgetGoal(
+                        monthYear = monthYear,
+                        totalMonthlyBudget = max,
+                        minMonthlyGoal = min,
+                        maxMonthlyGoal = max
+                    )
+                )
+            }
+
+
             Toast.makeText(this, "Goals Saved", Toast.LENGTH_SHORT).show()
 
 
